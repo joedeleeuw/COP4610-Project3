@@ -6,109 +6,138 @@
 #include <cstdlib>
 #include <uniistd.h>
 #include <stdio.h>
-
+#include "Filesystem.h"
+#define FOUT sdout 
 void handleCommand(char*[], int);
 
 int main (int argc, char* argv[])
 {
 	bool input = true;
-	handleCommand(argc, argv);
-	return 0;
+	char input = '\0';
+	if (argc < 2)
+	{
+		fprintf(FOUT, "%s\n", "No image file was provided");
+		fprintf(FOUT, "%s\n", "Usage: 'fatmod <image_name>'");
+		exit(0);
+	}
+	while(while input != "x")
+    {
+        
+         input = handleCommand(argc, argv);
+    }
+    return 0;
 }
 
-void handleCommand(char *argv[], int argc)
+char handleCommand(char *argv[], int argc)
 {
     string userArg = argv[0];
+    char type_of_command;
     
-    if (argc == 0)
+	 if (userArg.compare("fsinfo"))
+	{
+
+	}
+	else if (userArg.compare("open") == 0)
+	{
+		
+		{
+			fprintf("%s\n", "wrong amount of arguments supplied");
+		}
+	}
+	else if (userArg.compare("close") == 0)
+	{
+	
+		{
+			printf("%s\n", "wrong amount of arguments supplied");
+		}
+	}
+	else if (userArg.compare("create") == 0)
+	{
+		if (argc != 1)
+		{
+			printf("%s\n", "wrong amount of arguments supplied");
+		}
+	}
+	else if (userArg.compare("read") == 0)
+	{
+		if (argc != 3)
+		{
+			printf("%s\n", "wrong amount of arguments supplied");
+		}
+	}
+	else if (userArg.compare("write") == 0)
+	{
+		if (argc != 3)
+		{
+			printf("%s\n", "wrong amount of arguments supplied");
+		}
+	}
+	else if (userArg.compare("rm")== 0)
+	{
+		if (argc != 1)
+		{
+			printf("%s\n", "wrong amount of arguments supplied");
+		}
+	}
+	else if (userArg.compare("cd") == 0)
+	{
+		if (argc != 1)
+		{
+			printf("%s\n", "wrong amount of arguments supplied");
+		}
+	}
+	else if (userArg.compare("ls") == 0)
+	{
+		if (argc != 1)
+		{
+			printf("%s\n", "wrong amount of arguments supplied");
+		}
+	}
+	else if (userArg.compare("mkdir") == 0)
+	{
+		if (argc != 1)
+		{
+			printf("%s\n", "wrong amount of arguments supplied");
+		}
+	}
+	else if (userArg.compare("rmdir") == 0)
+	{
+		if (argc != 1)
+		{
+			printf("%s\n", "wrong amount of arguments supplied");
+		}
+	}
+	else if (userArg.compare("size") == 0)
+	{
+		if (argc != 1)
+		{
+			printf("%s\n", "wrong amount of arguments supplied");
+		}
+	}
+	else if (userArg.compare("undelete") == 0)
+	{
+
+	}
+    else if (userArg.compare("quit") == 0)
     {
-        printf("%s\n","not enoguh arguments supplied");
-        
+        type_of_command = 'x'
     }
-	else if (userArg.compare("fsinfo"))
-	{
-
-	}
-	else if (userArg.compare("open"))
-	{
-		if (argc != 2)
-		{
-			printf("%s\n", "wrong amount of arguments supplied");
-		}
-	}
-	else if (userArg.compare("close"))
-	{
-		if (argc != 1)
-		{
-			printf("%s\n", "wrong amount of arguments supplied");
-		}
-	}
-	else if (userArg.compare("create"))
-	{
-		if (argc != 1)
-		{
-			printf("%s\n", "wrong amount of arguments supplied");
-		}
-	}
-	else if (userArg.compare("read"))
-	{
-		if (argc != 3)
-		{
-			printf("%s\n", "wrong amount of arguments supplied");
-		}
-	}
-	else if (userArg.compare("write"))
-	{
-		if (argc != 3)
-		{
-			printf("%s\n", "wrong amount of arguments supplied");
-		}
-	}
-	else if (userArg.compare("rm"))
-	{
-		if (argc != 1)
-		{
-			printf("%s\n", "wrong amount of arguments supplied");
-		}
-	}
-	else if (userArg.compare("cd"))
-	{
-		if (argc != 1)
-		{
-			printf("%s\n", "wrong amount of arguments supplied");
-		}
-	}
-	else if (userArg.compare("ls"))
-	{
-		if (argc != 1)
-		{
-			printf("%s\n", "wrong amount of arguments supplied");
-		}
-	}
-	else if (userArg.compare("mkdir"))
-	{
-		if (argc != 1)
-		{
-			printf("%s\n", "wrong amount of arguments supplied");
-		}
-	}
-	else if (userArg.compare("rmdir"))
-	{
-		if (argc != 1)
-		{
-			printf("%s\n", "wrong amount of arguments supplied");
-		}
-	}
-	else if (userArg.compare("size"))
-	{
-		if (argc != 1)
-		{
-			printf("%s\n", "wrong amount of arguments supplied");
-		}
-	}
-	else if (userArg.compare("undelete"))
-	{
-
-	} 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
