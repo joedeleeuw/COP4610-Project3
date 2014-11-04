@@ -30,95 +30,105 @@ int main (int argc, char* argv[])
 
 char handleCommand(char *argv[], int argc)
 {
-    string userArg = argv[0];
-    char type_of_command;
     
-	 if (userArg.compare("fsinfo"))
+    char type_of_command;
+    string userCommand;
+    string commandBuffer;
+    getline(cin, userCommand);
+	string userArgs[5];
+    stringstream commandStream(userCommand);
+    
+    for(int i=0; i < 5; i++)
+    {
+    	commandStream >> commandBuffer
+    	userArgs[i] = commandBuffer;
+    }
+    
+    
+    if (userArgs[0].compare("fsinfo") == 0)
 	{
 
 	}
-	else if (userArg.compare("open") == 0)
+	else if (userArgs[0].compare("open") == 0)
+	{
+	 	if(userArgs[2] == NULL)
+		fprintf("%s\n", "wrong amount of arguments supplied");
+		
+	}
+	else if (userArgs[0].compare("close") == 0)
 	{
 		
-		{
-			fprintf("%s\n", "wrong amount of arguments supplied");
-		}
+		printf("%s\n", "wrong amount of arguments supplied");
+		
 	}
-	else if (userArg.compare("close") == 0)
-	{
-	
-		{
-			printf("%s\n", "wrong amount of arguments supplied");
-		}
-	}
-	else if (userArg.compare("create") == 0)
+	else if (userArgs[0].compare("create") == 0)
 	{
 		if (argc != 1)
 		{
 			printf("%s\n", "wrong amount of arguments supplied");
 		}
 	}
-	else if (userArg.compare("read") == 0)
+	else if (userArgs[0].compare("read") == 0)
 	{
 		if (argc != 3)
 		{
 			printf("%s\n", "wrong amount of arguments supplied");
 		}
 	}
-	else if (userArg.compare("write") == 0)
+	else if (userArgs[0].compare("write") == 0)
 	{
 		if (argc != 3)
 		{
 			printf("%s\n", "wrong amount of arguments supplied");
 		}
 	}
-	else if (userArg.compare("rm")== 0)
+	else if (userArgs[0].compare("rm")== 0)
 	{
 		if (argc != 1)
 		{
 			printf("%s\n", "wrong amount of arguments supplied");
 		}
 	}
-	else if (userArg.compare("cd") == 0)
+	else if (userArgs[0].compare("cd") == 0)
 	{
 		if (argc != 1)
 		{
 			printf("%s\n", "wrong amount of arguments supplied");
 		}
 	}
-	else if (userArg.compare("ls") == 0)
+	else if (userArgs[0].compare("ls") == 0)
 	{
 		if (argc != 1)
 		{
 			printf("%s\n", "wrong amount of arguments supplied");
 		}
 	}
-	else if (userArg.compare("mkdir") == 0)
+	else if (userArgs[0].compare("mkdir") == 0)
 	{
 		if (argc != 1)
 		{
 			printf("%s\n", "wrong amount of arguments supplied");
 		}
 	}
-	else if (userArg.compare("rmdir") == 0)
+	else if (userArgs[0].compare("rmdir") == 0)
 	{
 		if (argc != 1)
 		{
 			printf("%s\n", "wrong amount of arguments supplied");
 		}
 	}
-	else if (userArg.compare("size") == 0)
+	else if (userArgs[0].compare("size") == 0)
 	{
 		if (argc != 1)
 		{
 			printf("%s\n", "wrong amount of arguments supplied");
 		}
 	}
-	else if (userArg.compare("undelete") == 0)
+	else if (userArgs[0].compare("undelete") == 0)
 	{
 
 	}
-    else if (userArg.compare("quit") == 0)
+    else if (userArgs[0].compare("quit") == 0)
     {
         type_of_command = 'x'
     }
