@@ -1,6 +1,11 @@
 #ifndef FILESYSTEM_H_
 #define FILESYSTEM_H_
 
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <string>
 
 struct twoInts
 {
@@ -17,18 +22,20 @@ struct twoChars
 
 }myChars;
 
+class Filesystem {
+
+public: 
+
+Filesystem(string filename);
+void init();
 
 
+};
 
+private:
 
-
-
-
-
-
-
-
-
+string fname;
+FILE* image;
 
 
 
