@@ -20,8 +20,9 @@ int main (int argc, char* argv[])
 		fprintf(FOUT, "%s\n", "Usage: 'fatmod <image_name>'");
 		exit(0);
 	}
+	
 	Filesystem fs(argv[1]);
-
+	
 	while(while input != "x")
     {
       input = handleCommand(argc, argv);
@@ -47,7 +48,7 @@ char handleCommand(char *argv[], int argc)
     
     if (userArgs[0].compare("fsinfo") == 0)
 	{
-
+		
 	}
 	else if (userArgs[0].compare("open") == 0)
 	{

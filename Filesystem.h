@@ -11,14 +11,12 @@ struct twoInts
 {
 	int firstInt;
 	int secondInt;
-
 }myInts;
 
 struct twoChars
 {
 	char firstChar;
 	char secondChar;
-
 
 }myChars;
 
@@ -36,10 +34,5 @@ private:
 
 string fname;
 FILE* image;
-
-
-
-
-
 
 #endif

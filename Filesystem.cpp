@@ -17,5 +17,4 @@ void Filesystem::init()
 		cout << "could not open file: " << fname << endl;
 	}
 	
-	imageFile.close();
 }
