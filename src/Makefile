@@ -1,8 +1,13 @@
-fatmod: fatmod.o
-	gcc -o fatmod fatmod.o 
+all: fatmod
 
-fatmod.o: fatmod.c
-	gcc -c -std=gnu99 fatmod.c
+fatmod: fatmod.o filesystem.o
+	g++ fatmod.o filesystem.o -o fatmod
+
+fatmod.o: fatmod.cpp
+	g++ -c fatmod.cpp
+
+filesystem.o: filesystem.cpp filesystem.h
+	g++ -c filesystem.cpp 	
 
 clean: 
-	rm *.o fatmod
+	rm -f *.o fatmod
