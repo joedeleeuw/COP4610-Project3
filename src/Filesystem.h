@@ -17,7 +17,7 @@ class Filesystem {
 
 public: 
 
-Filesystem(string filename);
+Filesystem(const char*);
 void init();
 
 
@@ -56,7 +56,7 @@ uint32_t BPB_RootClus;
 /* the count of fAT data structures on the volime, only acceptable value should be 2 */
 uint8_t BPB_NuMFATs;
 /* only acceptable values: 512, 1024, 2048, 4096 */
-uint16_t BPB_BytesPerSec;
+uint16_t BPB_BytsPerSec;
 /* only acceptable values: 1,2,4,8,16,32,64, 128*/
 uint8_t BPB_SecPerClus;
 /*32 bit count of sectors occupied by one FAT.*/
@@ -64,8 +64,7 @@ uint32_t BPB_FATz32;
 /* total count of sectors on the volume.*/
 uint32_t BPB_TotSec32;
 
-string fname;
-FILE* image;
+const char* fname;
 int image_fd;
 char *fdata;
 
