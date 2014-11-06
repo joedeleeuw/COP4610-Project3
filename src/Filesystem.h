@@ -19,7 +19,7 @@ public:
 
 Filesystem(const char*);
 void init();
-
+void fsinfo();
 
 private:
 
@@ -51,6 +51,10 @@ T parseInteger(const char* const bitPosition)
 		}
 
 }
+
+
+
+
 /* The cluster number of the first cluster of the root directory.*/
 uint32_t BPB_RootClus;
 /* the count of fAT data structures on the volime, only acceptable value should be 2 */

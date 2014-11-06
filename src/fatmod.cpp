@@ -10,7 +10,7 @@
 #define FOUT stdout 
 
 using namespace std;
-char handleCommand(int,char*[]);
+char handleCommand(int,char*[],Filesystem*);
 
 int main (int argc, char* argv[])
 {
@@ -22,17 +22,17 @@ int main (int argc, char* argv[])
 		exit(0);
 	}
 	
-	Filesystem fs(argv[1]);
+	Filesystem *fs = new Filesystem(argv[1]);
 	
 	while (input != 'x')
     {
-      input = handleCommand(argc, argv);
+      input = handleCommand(argc, argv,fs);
     }
     
     return 0;
 }
 
-char handleCommand(int argc,char *argv[])
+char handleCommand(int argc,char *argv[], Filesystem* fs)
 {
     char type_of_command;
    	int i = 0; 
@@ -49,7 +49,7 @@ char handleCommand(int argc,char *argv[])
    
     if (userArgs[0].compare("fsinfo") == 0)
 	{
-		
+		fs->fsinfo();
 	}
 	else if (userArgs[0].compare("open") == 0)
 	{
