@@ -23,9 +23,21 @@ void Filesystem::init()
 	}
 	fdata = (char *)mmap(0, len, PROT_READ, MAP_PRIVATE, image_fd, offset);
 	BPB_RootClus = parseInteger<uint32_t>(fdata + 44);
-	BPB_NuMFATs = parseInteger<uint8_t, 2>(fdata + 16 );
-	BPB_BytsPerSec = parseInteger<uint8_t, 512, 1024, 2048, 4096>(fdata+ 11);
+	BPB_NuMFATs = parseInteger<uint8_t,2>(fdata + 16 );
+	BPB_BytsPerSec = parseInteger<uint16_t, 512, 1024, 2048, 4096>(fdata+ 11);
 	BPB_SecPerClus = parseInteger<uint8_t, 1, 2, 4, 8, 16, 32, 64, 128> (fdata + 13);
 	BPB_FATz32 = parseInteger<uint32_t>(fdata + 36);
 	BPB_TotSec32 = parseInteger<uint32_t>(fdata + 32);
+}
+
+void Filesystem::fsinfo()
+{
+
+	cout << BPB_BytsPerSec << " Bytes per sector" << endl;
+	fprintf(stdout,"%u Sectors per cluster\n",BPB_SecPerClus);
+	//cout << BPB_SecPerClus << " Sectors per cluster" << endl;
+	cout << BPB_TotSec32 << " Total sectors" << endl;
+	fprintf(stdout, "%u Number of FATs\n", BPB_NuMFATs);
+	cout << BPB_FATz32 << " Sectors per FAT" << endl;
+	/*Total free sectors goes here.*/
 }
