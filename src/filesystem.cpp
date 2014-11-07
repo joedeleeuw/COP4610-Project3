@@ -4,13 +4,18 @@
 #include <sys/mman.h>
 using namespace std;
 
-
+/*
+	Constructor for filesystem
+*/
 Filesystem::Filesystem(const char* name)
 {
 	fname = name;
 	init();
 }
 
+/* Called by constructor to set up required fields
+   for Filesystem
+*/
 void Filesystem::init()
 {
 	int offset = 0;
@@ -32,12 +37,13 @@ void Filesystem::init()
 
 void Filesystem::fsinfo()
 {
-
-	cout << BPB_BytsPerSec << " Bytes per sector" << endl;
+	fprintf(stdout,"%u Root Cluster\n",BPB_RootClus);
+	fprintf(stdout,"%u Bytes per sector\n",BPB_BytsPerSec);
 	fprintf(stdout,"%u Sectors per cluster\n",BPB_SecPerClus);
-	//cout << BPB_SecPerClus << " Sectors per cluster" << endl;
-	cout << BPB_TotSec32 << " Total sectors" << endl;
+	fprintf(stdout,"%u Toal sectors\n",BPB_TotSec32);
 	fprintf(stdout, "%u Number of FATs\n", BPB_NuMFATs);
-	cout << BPB_FATz32 << " Sectors per FAT" << endl;
-	/*Total free sectors goes here.*/
+	fprintf(stdout, "%u Sectors per FAT\n", BPB_FATz32);
+	
+	
 }
+
