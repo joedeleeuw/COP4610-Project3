@@ -33,6 +33,15 @@ void Filesystem::init()
 	BPB_SecPerClus = parseInteger<uint8_t, 1, 2, 4, 8, 16, 32, 64, 128> (fdata + 13);
 	BPB_FATz32 = parseInteger<uint32_t>(fdata + 36);
 	BPB_TotSec32 = parseInteger<uint32_t>(fdata + 32);
+	FSI_Free_Count = parseInteger<uint32_t>(fdata + 488);
+
+	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
+
+	RootClusterSector = ((BPB_RootClus - 2) * BPB_SecPerClus) + FirstDataSector;
+
+
+
+
 }
 
 void Filesystem::fsinfo()
@@ -45,5 +54,11 @@ void Filesystem::fsinfo()
 	fprintf(stdout, "%u Sectors per FAT\n", BPB_FATz32);
 	
 	
+}
+
+void Filesystem::openFile(string file_name, string mode)
+{
+
+
 }
 

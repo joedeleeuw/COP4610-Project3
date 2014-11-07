@@ -20,6 +20,18 @@ public:
 	Filesystem(const char*);
 	void init();
 	void fsinfo();
+	void openFile(string, string);
+	void closeFile(string);
+	void createFile(string);
+	void readfromFile(string,unsigned int, unsigned int);
+	void writetoFile(string, unsigned int, string);
+	void removeFile(string);
+	void changeDirectory(string);
+	void listDirectory(string);
+	void makeDirectory(string);
+	void removeDirectory(string);
+	void entrySize(string);
+	void restoreFile();
 
 private:
 
@@ -67,7 +79,13 @@ private:
 	uint32_t BPB_FATz32;
 	/* total count of sectors on the volume.*/
 	uint32_t BPB_TotSec32;
+	/* Number of reserved sector on the volume */
+	uint16_t BPB_ResvdSecCnt;
+	/*Contains the last known free cluster count on the volume*/
+	uint32_t FSI_Free_Count;	
 
+	int FirstDataSector;
+	int RootClusterSector;
 	const char* fname;
 	int image_fd;
 	char *fdata;
