@@ -4,13 +4,18 @@
 #include <sys/mman.h>
 using namespace std;
 
-
+/*
+	Constructor for filesystem
+*/
 Filesystem::Filesystem(const char* name)
 {
 	fname = name;
 	init();
 }
 
+/* Called by constructor to set up required fields
+   for Filesystem
+*/
 void Filesystem::init()
 {
 	int offset = 0;
