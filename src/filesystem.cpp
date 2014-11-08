@@ -39,9 +39,6 @@ void Filesystem::init()
 
 	RootClusterSector = ((BPB_RootClus - 2) * BPB_SecPerClus) + FirstDataSector;
 
-
-
-
 }
 
 /*
