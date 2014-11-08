@@ -7,14 +7,20 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "filesystem.h"
-#define FOUT stdout 
 
 using namespace std;
+
+// Globals
+#define FOUT stdout 
+
+// Prototypes
 char handleCommand(int,char*[],Filesystem*);
 
 int main (int argc, char* argv[])
 {
 	char input = '\0';
+	
+	// Checks for correct usage
 	if (argc < 2)
 	{
 		fprintf(FOUT, "%s\n", "No image file was provided");
@@ -24,6 +30,7 @@ int main (int argc, char* argv[])
 	
 	Filesystem *fs = new Filesystem(argv[1]);
 	
+	// Keep getting input until the user exits out
 	while (input != 'x')
     {
       input = handleCommand(argc, argv,fs);
@@ -34,7 +41,7 @@ int main (int argc, char* argv[])
 
 char handleCommand(int argc,char *argv[], Filesystem* fs)
 {
-    char type_of_command;
+    char type_of_command = 'a';
    	int i = 0; 
     string userCommand;
     string commandBuffer;
@@ -122,8 +129,9 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
     else if (userArgs[0].compare("quit") == 0)
     {
         type_of_command = 'x';
-    	return type_of_command;
     }
+    
+    return type_of_command;
 
 }
 
