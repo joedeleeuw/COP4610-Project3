@@ -42,6 +42,13 @@ void Filesystem::init()
 }
 
 /*
+	Lists directories out.
+*/
+void Filesystem::listDirectory(string dir_name){
+	
+}
+
+/*
 	Prints out file system information
 */
 void Filesystem::fsinfo()

@@ -29,7 +29,7 @@ int main (int argc, char* argv[])
 	}
 	
 	Filesystem *fs = new Filesystem(argv[1]);
-	
+	cout << "FAT32 Filesystem" << endl;
 	cout << "Please enter your command" << endl;
 	// Keep getting input until the user exits out
 	while (input != 'x')
@@ -122,7 +122,8 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 		if (userArgs[1] == ""){
 			printf("%s\n", "wrong amount of arguments supplied");
 		}else{
-			
+			// Lists out the directory NYI
+			fs->listDirectory(userArgs[1]);
 		}
 	}
 	else if (userArgs[0].compare("mkdir") == 0)
