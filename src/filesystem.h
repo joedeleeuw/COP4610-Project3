@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdint.h>
+#include <unordered_map>
 
 using namespace std;
 
@@ -90,6 +91,7 @@ private:
 	int image_fd;
 	char *fdata;
 
+	unordered_map< string, string> fileTable;
 };
 
 

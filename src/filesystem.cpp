@@ -59,6 +59,7 @@ void Filesystem::fsinfo()
 void Filesystem::openFile(string file_name, string mode)
 {
 
+	fileTable[file_name] = mode;
 
 }
 
