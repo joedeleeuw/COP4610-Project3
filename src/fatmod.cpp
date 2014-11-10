@@ -61,10 +61,10 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	}
 	else if (userArgs[0].compare("open") == 0)
 	{
-	 	if (userArgs[1] == ""){
+	 	if (userArgs[2] == ""){
 			printf("%s\n", "wrong amount of arguments supplied");
 	 	}else{
-	 		
+	 		fs->openFile(userArgs[1],userArgs[2]);
 	 	}
 		
 	}
