@@ -61,7 +61,10 @@ private:
 					return val;
 				}
 				//throw exception.
-			}
+		}
+		
+		// We should never reach this point but supresses errors
+		return val;
 
 	}
 

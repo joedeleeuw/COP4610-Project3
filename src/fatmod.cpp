@@ -7,14 +7,20 @@
 #include <unistd.h>
 #include <stdio.h>
 #include "filesystem.h"
-#define FOUT stdout 
 
 using namespace std;
+
+// Globals
+#define FOUT stdout 
+
+// Prototypes
 char handleCommand(int,char*[],Filesystem*);
 
 int main (int argc, char* argv[])
 {
 	char input = '\0';
+	
+	// Checks for correct usage
 	if (argc < 2)
 	{
 		fprintf(FOUT, "%s\n", "No image file was provided");
@@ -23,7 +29,9 @@ int main (int argc, char* argv[])
 	}
 	
 	Filesystem *fs = new Filesystem(argv[1]);
-	
+	cout << "FAT32 Filesystem" << endl;
+	cout << "Please enter your command" << endl;
+	// Keep getting input until the user exits out
 	while (input != 'x')
     {
       input = handleCommand(argc, argv,fs);
@@ -34,7 +42,7 @@ int main (int argc, char* argv[])
 
 char handleCommand(int argc,char *argv[], Filesystem* fs)
 {
-    char type_of_command;
+    char type_of_command = 'a';
    	int i = 0; 
     string userCommand;
     string commandBuffer;
@@ -53,33 +61,47 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	}
 	else if (userArgs[0].compare("open") == 0)
 	{
-	 	if (userArgs[1] == "")
-		printf("%s\n", "wrong amount of arguments supplied");
+	 	if (userArgs[1] == ""){
+			printf("%s\n", "wrong amount of arguments supplied");
+	 	}else{
+	 		
+	 	}
 		
 	}
 	else if (userArgs[0].compare("close") == 0)
 	{
-		if (userArgs[1] == "")
-		printf("%s\n", "wrong amount of arguments supplied");
+		if (userArgs[1] == ""){
+			printf("%s\n", "wrong amount of arguments supplied");
+		}else{
+			
+		}
 		
 	}
 	else if (userArgs[0].compare("create") == 0)
 	{
-		if (userArgs[1] == "")
-		printf("%s\n", "wrong amount of arguments supplied");
+		if (userArgs[1] == ""){
+			printf("%s\n", "wrong amount of arguments supplied");
+		}else{
+			
+		}
 		
 	}
 	else if (userArgs[0].compare("read") == 0)
 	{
-		if (userArgs[3] == "")		
-		printf("%s\n", "wrong amount of arguments supplied");
+		if (userArgs[3] == ""){
+			printf("%s\n", "wrong amount of arguments supplied");
+		}else{
+			
+		}
 		
 	}
 	else if (userArgs[0].compare("write") == 0)
 	{
-		if (userArgs[3] == "")
-		printf("%s\n", "wrong amount of arguments supplied");
-		
+		if (userArgs[3] == ""){
+			printf("%s\n", "wrong amount of arguments supplied");
+		}else{
+			
+		}
 	}
 	else if (userArgs[0].compare("rm")== 0)
 	{
@@ -89,41 +111,59 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	}
 	else if (userArgs[0].compare("cd") == 0)
 	{
-		if (userArgs[1] == "")
-		printf("%s\n", "wrong amount of arguments supplied");
-		
+		if (userArgs[1] == ""){
+			printf("%s\n", "wrong amount of arguments supplied");
+		}else{
+			
+		}
 	}
 	else if (userArgs[0].compare("ls") == 0)
 	{
-		if (userArgs[1] == "")
-		printf("%s\n", "wrong amount of arguments supplied");
-		
+		if (userArgs[1] == ""){
+			printf("%s\n", "wrong amount of arguments supplied");
+		}else{
+			// Lists out the directory NYI
+			fs->listDirectory(userArgs[1]);
+		}
 	}
 	else if (userArgs[0].compare("mkdir") == 0)
 	{
-		if (userArgs[1] == "")
-		printf("%s\n", "wrong amount of arguments supplied");
-		
+		if (userArgs[1] == ""){
+			printf("%s\n", "wrong amount of arguments supplied");
+		}else{
+			
+		}
 	}
 	else if (userArgs[0].compare("rmdir") == 0)
 	{
-		if (userArgs[1] == "")
-		printf("%s\n", "wrong amount of arguments supplied");
+		if (userArgs[1] == ""){
+			printf("%s\n", "wrong amount of arguments supplied");
+		}else{
+			
+		}
 	}
 	else if (userArgs[0].compare("size") == 0)
 	{
-		if (userArgs[1] == "")
-		printf("%s\n", "wrong amount of arguments supplied");
+		if (userArgs[1] == ""){
+			printf("%s\n", "wrong amount of arguments supplied");
+		}else{
+			
+		}
 	}
 	else if (userArgs[0].compare("undelete") == 0)
 	{
-
+		if (userArgs[1] != ""){
+			printf("%s\n", "wrong amount of arguments supplied");
+		}else{
+			
+		}
 	}
     else if (userArgs[0].compare("quit") == 0)
     {
         type_of_command = 'x';
-    	return type_of_command;
     }
+    
+    return type_of_command;
 
 }
 

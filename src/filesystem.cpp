@@ -39,11 +39,18 @@ void Filesystem::init()
 
 	RootClusterSector = ((BPB_RootClus - 2) * BPB_SecPerClus) + FirstDataSector;
 
-
-
-
 }
 
+/*
+	Lists directories out.
+*/
+void Filesystem::listDirectory(string dir_name){
+	
+}
+
+/*
+	Prints out file system information
+*/
 void Filesystem::fsinfo()
 {
 	fprintf(stdout,"%u Root Cluster\n",BPB_RootClus);
@@ -52,8 +59,6 @@ void Filesystem::fsinfo()
 	fprintf(stdout,"%u Toal sectors\n",BPB_TotSec32);
 	fprintf(stdout, "%u Number of FATs\n", BPB_NuMFATs);
 	fprintf(stdout, "%u Sectors per FAT\n", BPB_FATz32);
-	
-	
 }
 
 void Filesystem::openFile(string file_name, string mode)
