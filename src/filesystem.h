@@ -1,6 +1,10 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
+/*
+	Contains code for calling out commands from the userspace (ls etc.)
+*/
+
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
