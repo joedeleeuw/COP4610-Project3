@@ -18,11 +18,22 @@
 
 using namespace std;
 
-class Filesystem {
+struct FatEntry{
+
+
+};
+
+
+class Filesystem 
+
+{
 
 public: 
 
 	Filesystem(const char*);
+	FatEntry findFatEntry(uint32_t);
+
+
 	void init();
 	void fsinfo();
 	void openFile(string, string);
@@ -37,6 +48,8 @@ public:
 	void removeDirectory(string);
 	void entrySize(string);
 	void restoreFile();
+
+
 
 private:
 
@@ -72,9 +85,6 @@ private:
 
 	}
 
-
-
-
 	/* The cluster number of the first cluster of the root directory.*/
 	uint32_t BPB_RootClus;
 	/* the count of fAT data structures on the volime, only acceptable value should be 2 */
@@ -90,7 +100,9 @@ private:
 	/* Number of reserved sector on the volume */
 	uint16_t BPB_ResvdSecCnt;
 	/*Contains the last known free cluster count on the volume*/
-	uint32_t FSI_Free_Count;	
+	uint32_t FSI_Free_Count;
+
+
 
 	int FirstDataSector;
 	int RootClusterSector;

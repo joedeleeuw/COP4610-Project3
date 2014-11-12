@@ -16,6 +16,14 @@ Filesystem::Filesystem(const char* name)
 /* Called by constructor to set up required fields
    for Filesystem
 */
+
+FatEntry Filesystem::findFatEntry(uint32_t clusterNumber)
+{
+	FatEntry entry;
+
+
+}
+
 void Filesystem::init()
 {
 	int offset = 0;
@@ -27,6 +35,7 @@ void Filesystem::init()
 		exit(EXIT_FAILURE);
 	}
 	fdata = (char *)mmap(0, len, PROT_READ, MAP_PRIVATE, image_fd, offset);
+	
 	BPB_RootClus = parseInteger<uint32_t>(fdata + 44);
 	BPB_NuMFATs = parseInteger<uint8_t,2>(fdata + 16 );
 	BPB_BytsPerSec = parseInteger<uint16_t, 512, 1024, 2048, 4096>(fdata+ 11);
@@ -36,15 +45,17 @@ void Filesystem::init()
 	FSI_Free_Count = parseInteger<uint32_t>(fdata + 488);
 
 	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
-
+	
 	RootClusterSector = ((BPB_RootClus - 2) * BPB_SecPerClus) + FirstDataSector;
-
+	fprintf(stdout,"First Data Sector %u ",RootClusterSector);
+	
 }
 
 /*
 	Lists directories out.
 */
-void Filesystem::listDirectory(string dir_name){
+void Filesystem::listDirectory(string dir_name)
+{
 	
 }
 

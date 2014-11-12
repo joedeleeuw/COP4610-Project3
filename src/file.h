@@ -3,8 +3,15 @@
 
 using namespace std;
 
+class File {
+
+public:
 
 
+private: 
+
+
+}
 
 
 #endif 
