@@ -8,6 +8,13 @@
 #include <stdio.h>
 #include "filesystem.h"
 
+/*
+Order of files requiring each other from none to some is
+
+biosblock -> fatcluster -> fatdirectory -> filesystem
+
+*/
+
 using namespace std;
 
 // Globals
