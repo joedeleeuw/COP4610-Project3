@@ -9,10 +9,18 @@
 #include "filesystem.h"
 
 /*
-Order of files requiring each other from none to some is
 
-biosblock -> fatcluster -> fatdirectory -> filesystem
+We've got these main tables to concern about the
 
+// Offset stuff
+Boot Sector and BPB Structure (page 9)
+FAT32 Structure Starting at Offset 36 (page 12)
+
+FAT32 FSInfo Sector Structure and Backup Boot Sector (pg 21)
+FAT32 Byte Directory Entry Structure (pg 23)
+
+BPB = BIOS Parameter Block
+MBR = Master boot record
 */
 
 using namespace std;
@@ -168,6 +176,12 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
     else if (userArgs[0].compare("quit") == 0)
     {
         type_of_command = 'x';
+    }
+    // Testing purposes
+    else{
+    	FatEntry FATEntry = fs->findFatEntry(2);
+    	cout << FATEntry.FATOffset << endl;
+    	cout << FATEntry.FATsecNum << endl;
     }
     
     return type_of_command;
