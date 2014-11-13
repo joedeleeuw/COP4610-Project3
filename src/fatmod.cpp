@@ -19,7 +19,8 @@ FAT32 Structure Starting at Offset 36 (page 12)
 FAT32 FSInfo Sector Structure and Backup Boot Sector (pg 21)
 FAT32 Byte Directory Entry Structure (pg 23)
 
-
+BPB = BIOS Parameter Block
+MBR = Master boot record
 */
 
 using namespace std;
