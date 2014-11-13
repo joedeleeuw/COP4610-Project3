@@ -61,6 +61,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
    	int i = 0; 
     string userCommand;
     string commandBuffer;
+    cout << "[fat32.img]> ";
     getline(cin, userCommand);
     string userArgs[5];
     istringstream commandStream(userCommand);
