@@ -177,6 +177,12 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
     {
         type_of_command = 'x';
     }
+    // Testing purposes
+    else{
+    	FatEntry FATEntry = fs->findFatEntry(2);
+    	cout << FATEntry.FATOffset << endl;
+    	cout << FATEntry.FATsecNum << endl;
+    }
     
     return type_of_command;
 
