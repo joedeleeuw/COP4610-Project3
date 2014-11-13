@@ -4,19 +4,18 @@
 #include <sys/mman.h>
 using namespace std;
 
+
+// FATENTRY
 /*
-	Constructor for filesystem
+	Pass in the cluster number and it finds the FAT entry
+	
+	Example implementation -
+	   FatEntry FATEntry = fs->findFatEntry(2);
+    	cout << FATEntry.FATOffset << endl;
+    	cout << FATEntry.FATsecNum << endl;
+    	
+    clusterNumber 2 should be the root
 */
-Filesystem::Filesystem(const char* name)
-{
-	fname = name;
-	init();
-}
-
-/* Called by constructor to set up required fields
-   for Filesystem
-*/
-
 FatEntry Filesystem::findFatEntry(uint32_t clusterNumber)
 {
 	FatEntry entry;
@@ -32,6 +31,21 @@ FatEntry Filesystem::findFatEntry(uint32_t clusterNumber)
 	return entry;
 }
 
+
+// FILESYSTEM
+
+/*
+	Constructor for filesystem
+*/
+Filesystem::Filesystem(const char* name)
+{
+	fname = name;
+	init();
+}
+
+/* Called by constructor to set up required fields
+   for Filesystem
+*/
 void Filesystem::init()
 {
 	int offset = 0;
