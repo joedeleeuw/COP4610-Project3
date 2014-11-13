@@ -17,6 +17,9 @@ Filesystem::Filesystem(const char* name)
    for Filesystem
 */
 
+/*
+	Pass in the cluster number and it finds the FAT entry
+*/
 FatEntry Filesystem::findFatEntry(uint32_t clusterNumber)
 {
 	FatEntry entry;

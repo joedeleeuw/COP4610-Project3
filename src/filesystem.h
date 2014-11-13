@@ -46,7 +46,7 @@ public:
 	void writetoFile(string, unsigned int, string);
 	void removeFile(string);
 	void changeDirectory(string);
-	void listDirectory(string);
+	void listDirectory(string); // ls command
 	void makeDirectory(string);
 	void removeDirectory(string);
 	void entrySize(string);

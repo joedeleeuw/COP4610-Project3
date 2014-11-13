@@ -1,2 +1,2 @@
 #!/bin/bash
-make clean; make; ./fatmod fat32.img
+make clean; make; ./fmod fat32.img

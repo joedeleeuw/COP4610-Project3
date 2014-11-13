@@ -9,9 +9,16 @@
 #include "filesystem.h"
 
 /*
-Order of files requiring each other from none to some is
 
-biosblock -> fatcluster -> fatdirectory -> filesystem
+We've got these main tables to concern about the
+
+// Offset stuff
+Boot Sector and BPB Structure (page 9)
+FAT32 Structure Starting at Offset 36 (page 12)
+
+FAT32 FSInfo Sector Structure and Backup Boot Sector (pg 21)
+FAT32 Byte Directory Entry Structure (pg 23)
+
 
 */
 
