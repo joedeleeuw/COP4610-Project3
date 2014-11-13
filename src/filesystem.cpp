@@ -20,8 +20,16 @@ Filesystem::Filesystem(const char* name)
 FatEntry Filesystem::findFatEntry(uint32_t clusterNumber)
 {
 	FatEntry entry;
+	uint32_t fatOffset = clusterNumber * 4;
 
+	div_t result;
 
+	result = div(fatOffset,BPB_BytsPerSec);
+
+	entry.FATsecNum = BPB_ResvdSecCnt + (fatOffset / BPB_BytsPerSec );
+	entry.FATOffset = result.rem;
+
+	return entry;
 }
 
 void Filesystem::init()

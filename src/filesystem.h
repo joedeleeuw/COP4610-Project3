@@ -20,7 +20,10 @@ using namespace std;
 
 struct FatEntry{
 
-
+uint32_t FATsecNum;
+uint32_t FATOffset;
+uint32_t nextCluster;
+uint32_t location;
 };
 
 
