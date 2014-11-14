@@ -47,8 +47,11 @@ Filesystem::Filesystem(const char* name)
 */
 void Filesystem::init()
 {
+	// Get the file size first
+	getFileSize();
+	
 	int offset = 0;
-	unsigned len = 67108864; // Length of the file reading
+	unsigned len = fileSize; // Length of the file reading
 	image_fd = open(fname, O_RDWR);
 	if (image_fd < 0)
 	{
@@ -73,6 +76,26 @@ void Filesystem::init()
 	
 	// Gets the FATEntry information
 	FATEntryRCluster = this->findFatEntry(RootClusterSector);
+}
+
+/*
+	Finds the file passed in by the user in fatmod.cpp and
+	stores the size in fileSize
+*/
+void Filesystem::getFileSize(){
+  FILE * file;
+
+  file = fopen (fname,"rb");
+  // If file not found
+  if (file==NULL){
+  	perror ("Error opening file");
+  }
+  else
+  {
+    fseek(file, 0, SEEK_END); // Goes through the file
+    fileSize = ftell(file);
+    fclose (file); // Close file we don't need it anymore
+  }
 }
 
 /*

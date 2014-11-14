@@ -62,8 +62,9 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
     string userCommand;
     string commandBuffer;
     cout << "[fat32.img]> ";
-    getline(cin, userCommand);
+    getline(cin, userCommand); // Gets users input
     string userArgs[5];
+    
     istringstream commandStream(userCommand);
     while( commandStream >> commandBuffer)
     {
@@ -180,6 +181,8 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
     }
     // Testing purposes
     else{
+    	cout << fs->FATEntryRCluster.FATOffset << endl;
+    	cout << fs->FATEntryRCluster.FATsecNum << endl;
     	fs->findRootDirectory();
     }
     

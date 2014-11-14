@@ -56,6 +56,7 @@ public:
 	void entrySize(string);
 	void restoreFile();
 	void findRootDirectory();
+	void getFileSize();
 
 	/*
 		Parses the integer by taking in a posiion
@@ -119,8 +120,9 @@ public:
 
 	int FirstDataSector;
 	int RootClusterSector;
-	const char* fname;
+	const char* fname; // file name
 	int image_fd;
+	unsigned fileSize; // Stores file size
 	uint8_t *fdata;
 
 	unordered_map< string, string> fileTable;
