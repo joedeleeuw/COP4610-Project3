@@ -48,14 +48,14 @@ Filesystem::Filesystem(const char* name)
 void Filesystem::init()
 {
 	int offset = 0;
-	unsigned len = 4096;
+	unsigned len = 67108864; // Length of the file reading
 	image_fd = open(fname, O_RDWR);
 	if (image_fd < 0)
 	{
 		cout << "error while opening the file" << endl;
 		exit(EXIT_FAILURE);
 	}
-	fdata = (char *)mmap(0, len, PROT_READ, MAP_PRIVATE, image_fd, offset);
+	fdata = (uint8_t*)mmap(0, len, PROT_READ, MAP_PRIVATE, image_fd, offset);
 	
 	BPB_RootClus = parseInteger<uint32_t>(fdata + 44);
 	BPB_NuMFATs = parseInteger<uint8_t,2>(fdata + 16 );
@@ -64,8 +64,17 @@ void Filesystem::init()
 	BPB_FATz32 = parseInteger<uint32_t>(fdata + 36);
 	BPB_TotSec32 = parseInteger<uint32_t>(fdata + 32);
 	FSI_Free_Count = parseInteger<uint32_t>(fdata + 488);
+	BPB_ResvdSecCnt = parseInteger<uint32_t>(fdata + 14);
 
 	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
+	
+	for(int i = 0; i < 32; i++){
+		for(int v = 0; v < 11; v++)
+		{
+			cout << (char)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + v);
+		}
+		cout << endl;
+	}
 	
 	RootClusterSector = ((BPB_RootClus - 2) * BPB_SecPerClus) + FirstDataSector;
 	fprintf(stdout,"First Data Sector %u ",RootClusterSector);
@@ -82,8 +91,8 @@ void Filesystem::init()
 */
 void Filesystem::findRootDirectory()
 {
-	nextClusterNum = parseInteger<uint32_t>(FATEntryRCluster.FATsecNum + FATEntryRCluster.FATOffset);
-	fprintf(stdout, "Next cluster Number %u\n",nextClusterNum);
+	//nextClusterNum = parseInteger<uint32_t>((char*)(FATEntryRCluster.FATsecNum + FATEntryRCluster.FATOffset));
+	//fprintf(stdout, "Next cluster Number %u\n",nextClusterNum);
 }
 
 /*

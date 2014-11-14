@@ -61,7 +61,7 @@ public:
 		Parses the integer by taking in a posiion
 	*/
 	template<typename T, const T...validArgs>
-	T parseInteger(const char* const bitPosition)
+	T parseInteger(unsigned char* const bitPosition)
 	{
 		T val = 0;
 
@@ -121,7 +121,7 @@ public:
 	int RootClusterSector;
 	const char* fname;
 	int image_fd;
-	char *fdata;
+	uint8_t *fdata;
 
 	unordered_map< string, string> fileTable;
 };
