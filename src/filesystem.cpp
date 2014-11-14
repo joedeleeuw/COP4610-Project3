@@ -1,9 +1,4 @@
 #include "filesystem.h"
-#include <iostream>
-#include <fstream>
-#include <sys/mman.h>
-using namespace std;
-
 
 // FATENTRY
 /*
@@ -16,7 +11,7 @@ using namespace std;
     	
     clusterNumber 2 should be the root
 */
-FatEntry Filesystem::findFatEntry(uint32_t clusterNumber)
+FatEntry Filesystem::findFatEntry(uint32_t clusterNumber )
 {
 	FatEntry entry;
 	uint32_t fatOffset = clusterNumber * 4;
@@ -24,7 +19,11 @@ FatEntry Filesystem::findFatEntry(uint32_t clusterNumber)
 	div_t result;
 
 	result = div(fatOffset,BPB_BytsPerSec);
-
+	/*FATsecNum is the sector number of the FAT sector that contains the entry 
+	  for cluster N in the first FAT. If you want the sector number in the second 
+	  FAT, you add FATSz to ThisFATSecNum; for the third FAT, you add 2*FATSz, 
+	  and so on.
+	*/
 	entry.FATsecNum = BPB_ResvdSecCnt + (fatOffset / BPB_BytsPerSec );
 	entry.FATOffset = result.rem;
 
@@ -71,6 +70,20 @@ void Filesystem::init()
 	RootClusterSector = ((BPB_RootClus - 2) * BPB_SecPerClus) + FirstDataSector;
 	fprintf(stdout,"First Data Sector %u ",RootClusterSector);
 	
+	// Gets the FATEntry information
+	FATEntryRCluster = this->findFatEntry(RootClusterSector);
+}
+
+/*
+		We go to ThisFASecNum and start reading it
+		at offset ThisFATEntOffset. FAT will then give us
+		the next cluster number in the directory or the End
+		of Cluster Chain.
+*/
+void Filesystem::findRootDirectory()
+{
+	nextClusterNum = parseInteger<uint32_t>(FATEntryRCluster.FATsecNum + FATEntryRCluster.FATOffset);
+	fprintf(stdout, "Next cluster Number %u\n",nextClusterNum);
 }
 
 /*
@@ -100,4 +113,3 @@ void Filesystem::openFile(string file_name, string mode)
 	fileTable[file_name] = mode;
 
 }
-

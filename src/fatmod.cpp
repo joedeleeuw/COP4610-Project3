@@ -180,9 +180,9 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
     }
     // Testing purposes
     else{
-    	FatEntry FATEntry = fs->findFatEntry(2);
-    	cout << FATEntry.FATOffset << endl;
-    	cout << FATEntry.FATsecNum << endl;
+    	cout << fs->FATEntryRCluster.FATOffset << endl;
+    	cout << fs->FATEntryRCluster.FATsecNum << endl;
+    	fs->findRootDirectory();
     }
     
     return type_of_command;

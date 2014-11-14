@@ -2,4 +2,8 @@
 #define BIOSBLOCK_H
 
 
+class biosParamBlock{
+    
+
+
 #endif 

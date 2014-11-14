@@ -15,15 +15,19 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <unordered_map>
+#include <iostream>
+#include <fstream>
+#include <sys/mman.h>
 
 using namespace std;
 
 struct FatEntry{
 
-uint32_t FATsecNum;
-uint32_t FATOffset;
-uint32_t nextCluster;
-uint32_t location;
+	uint32_t FATsecNum;
+	uint32_t FATOffset;
+	uint32_t nextCluster;
+	uint32_t location;
+	
 };
 
 
@@ -51,12 +55,11 @@ public:
 	void removeDirectory(string);
 	void entrySize(string);
 	void restoreFile();
+	void findRootDirectory();
 
-
-
-private:
-
-
+	/*
+		Parses the integer by taking in a posiion
+	*/
 	template<typename T, const T...validArgs>
 	T parseInteger(const char* const bitPosition)
 	{
@@ -88,6 +91,9 @@ private:
 
 	}
 
+
+//private:
+
 	/* The cluster number of the first cluster of the root directory.*/
 	uint32_t BPB_RootClus;
 	/* the count of fAT data structures on the volime, only acceptable value should be 2 */
@@ -104,8 +110,12 @@ private:
 	uint16_t BPB_ResvdSecCnt;
 	/*Contains the last known free cluster count on the volume*/
 	uint32_t FSI_Free_Count;
+	
+	// Custom storage
+	uint32_t nextClusterNum;
 
-
+	// FATEntr info
+	FatEntry FATEntryRCluster;
 
 	int FirstDataSector;
 	int RootClusterSector;
