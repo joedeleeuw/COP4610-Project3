@@ -68,14 +68,6 @@ void Filesystem::init()
 
 	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
 	
-	for(int i = 0; i < 32; i++){
-		for(int v = 0; v < 11; v++)
-		{
-			cout << (char)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + v);
-		}
-		cout << endl;
-	}
-	
 	RootClusterSector = ((BPB_RootClus - 2) * BPB_SecPerClus) + FirstDataSector;
 	fprintf(stdout,"First Data Sector %u ",RootClusterSector);
 	
@@ -91,8 +83,13 @@ void Filesystem::init()
 */
 void Filesystem::findRootDirectory()
 {
-	//nextClusterNum = parseInteger<uint32_t>((char*)(FATEntryRCluster.FATsecNum + FATEntryRCluster.FATOffset));
-	//fprintf(stdout, "Next cluster Number %u\n",nextClusterNum);
+	for(int i = 0; i < 32; i++){
+		for(int v = 0; v < 11; v++)
+		{
+			cout << (char)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + v);
+		}
+		cout << endl;
+	}
 }
 
 /*
