@@ -1,0 +1,1 @@
+Cant assume we will be using fat32.img need to get the actual size in our code.
