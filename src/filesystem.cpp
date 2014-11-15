@@ -76,6 +76,11 @@ void Filesystem::init()
 	
 	// Gets the FATEntry information
 	FATEntryRCluster = this->findFatEntry(RootClusterSector);
+
+	
+	uint32_t tempNextCluster = parseInteger<uint32_t>(fdata +FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum);
+	
+	fprintf(stdout,"Next possible cluster value %u\n", tempNextCluster);
 }
 
 /*
@@ -106,10 +111,31 @@ void Filesystem::getFileSize(){
 */
 void Filesystem::findRootDirectory()
 {
-	for(int i = 0; i < 32; i++){
-		for(int v = 0; v < 11; v++)
+	for(int i = 0; i < 100; i++){
+		// If it's a long file name
+		if((int)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15){
+				continue;	
+		}
+		for(int v = 0; v < 12; v++)
 		{
-			cout << (char)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + v);
+			
+			// USE PAGE 34 from fatspec.pdf here or in directories
+			unsigned char val = (unsigned char)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + v);
+			
+			// Beginning of directory found
+			if(v == 0 && val == 0xE5){
+				cout << "Begining of directory" << endl;
+				continue;
+			}
+			// End of directory found
+			else if(v == 0 && val == 0x00){
+				cout << "End of directory" << endl;
+				continue;
+			}
+			// 
+			else{
+				fprintf(stdout, "%c",val);
+			}
 		}
 		cout << endl;
 	}

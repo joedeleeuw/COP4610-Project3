@@ -18,6 +18,7 @@
 #include <iostream>
 #include <fstream>
 #include <sys/mman.h>
+#include "directory.h" // For directory handling
 
 using namespace std;
 
