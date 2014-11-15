@@ -109,7 +109,19 @@ void Filesystem::findRootDirectory()
 	for(int i = 0; i < 32; i++){
 		for(int v = 0; v < 11; v++)
 		{
-			cout << (char)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + v);
+			char val = (char)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + v);
+			// Unused record found
+			if(v == 0 && val == 0xE5){
+				cout << "Begining of directory" << endl;
+			}
+			// End of directory fou
+			else if(v == 0 && val == 0x00){
+				cout << "End of directory" << endl;
+			}
+			// 
+			else{
+				cout << val;
+			}
 		}
 		cout << endl;
 	}
