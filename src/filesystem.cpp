@@ -111,30 +111,55 @@ void Filesystem::getFileSize(){
 */
 void Filesystem::findRootDirectory()
 {
-	for(int i = 0; i < 100; i++){
+	for(int i = 0; i < 32; i++){
 		// If it's a long file name
-		if((int)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15){
-				continue;	
-		}
-		for(int v = 0; v < 12; v++)
+		if((int)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
+		
+		for(int v = 0; v < 32; v++)
 		{
 			
-			// USE PAGE 34 from fatspec.pdf here or in directories
-			unsigned char val = (unsigned char)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + v);
-			
+			char val = (char)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + v);
 			// Beginning of directory found
-			if(v == 0 && val == 0xE5){
-				cout << "Begining of directory" << endl;
+			if(v == 0 && val == 0xE5)
+			{
+				//cout << "Begining of directory" << endl;
 				continue;
 			}
 			// End of directory found
-			else if(v == 0 && val == 0x00){
-				cout << "End of directory" << endl;
+			else if(v == 0 && val == 0x00)
+			{
+				//cout << "End of directory" << endl;
 				continue;
 			}
 			// 
-			else{
+			/*else if( v == 11 ){
+				fprintf(stdout, "%c")
+			}*/
+			else if(v < 11)
+			{
 				fprintf(stdout, "%c",val);
+			}
+		
+			else if (v >11 && v <=15)
+			{
+				int converter = val - '0';
+				//if(v == 15)
+				uint32_t highBits;
+				uint32_t lowBits;
+				uint32_t nextClusterLocation;
+				fprintf(stdout, "index: %d value: %u\n",v,val);
+				if (v == 12) highBits = converter;
+				if(v == 13)highBits = highBits | converter;
+
+				
+				if(v == 14)lowBits = converter;
+				if(v==15)
+				{
+					lowBits = lowBits | converter;  
+					nextClusterLocation = highBits | lowBits;
+				}
+				fprintf(stdout, "%u", nextClusterLocation);
+				
 			}
 		}
 		cout << endl;
