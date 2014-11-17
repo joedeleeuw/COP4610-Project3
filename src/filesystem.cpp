@@ -1,4 +1,6 @@
 #include "filesystem.h"
+#include "directory.h"
+#include <vector>
 
 // FATENTRY
 /*
@@ -66,7 +68,7 @@ void Filesystem::init()
 	BPB_SecPerClus = parseInteger<uint8_t, 1, 2, 4, 8, 16, 32, 64, 128> (fdata + 13);
 	BPB_FATz32 = parseInteger<uint32_t>(fdata + 36);
 	BPB_TotSec32 = parseInteger<uint32_t>(fdata + 32);
-	FSI_Free_Count = parseInteger<uint32_t>(fdata + 488);
+	
 	BPB_ResvdSecCnt = parseInteger<uint32_t>(fdata + 14);
 
 	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
@@ -111,60 +113,35 @@ void Filesystem::getFileSize(){
 */
 void Filesystem::findRootDirectory()
 {
-	for(int i = 0; i < 32; i++){
-		// If it's a long file name
-		if((int)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
-		
-		for(int v = 0; v < 32; v++)
+	/*struct to hold file entries.*/
+	
+	fileRecord record;
+	std::vector<fileRecord> files;
+	for(int i = 0; i < 32; i++)
 		{
-			
-			char val = (char)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + v);
-			// Beginning of directory found
-			if(v == 0 && val == 0xE5)
-			{
-				//cout << "Begining of directory" << endl;
-				continue;
-			}
-			// End of directory found
-			else if(v == 0 && val == 0x00)
-			{
-				//cout << "End of directory" << endl;
-				continue;
-			}
-			// 
-			/*else if( v == 11 ){
-				fprintf(stdout, "%c")
-			}*/
-			else if(v < 11)
-			{
-				fprintf(stdout, "%c",val);
-			}
 		
-			else if (v >11 && v <=15)
+		// If it's a long file name
+			if((int)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
+			for (int j = 0; j < 11; j++)
 			{
-				int converter = val - '0';
-				//if(v == 15)
-				uint32_t highBits;
-				uint32_t lowBits;
-				uint32_t nextClusterLocation;
-				fprintf(stdout, "index: %d value: %u\n",v,val);
-				if (v == 12) highBits = converter;
-				if(v == 13)highBits = highBits | converter;
-
-				
-				if(v == 14)lowBits = converter;
-				if(v==15)
-				{
-					lowBits = lowBits | converter;  
-					nextClusterLocation = highBits | lowBits;
-				}
-				fprintf(stdout, "%u", nextClusterLocation);
-				
+				//fprintf(stderr,"inner counter index: %d\n", j);
+				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
+				record.name[j]= parseInteger<uint8_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + j);
+				fprintf(stdout,"%c", (char)record.name[j]);
 			}
+			cout << " ";
+			//fprintf(stderr,"outer counter index: %d\n", i);
+			record.highCluster = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 12);
+			record.lowCluster = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 14);
+			fprintf(stdout,"highCluster: %u ",record.highCluster);
+			fprintf(stdout,"lowCluster: %u",record.lowCluster);
+		
+			cout << endl;
+			files.push_back(record); 
 		}
-		cout << endl;
-	}
+		
 }
+
 
 /*
 	Lists directories out.
