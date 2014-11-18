@@ -19,10 +19,13 @@
 #include <fstream>
 #include <sys/mman.h>
 
-#include "directory.h" // For directory handling
+// Custom classes
 #include "file.h"
+#include "directory.h" // For directory handling
 
 using namespace std;
+
+// Forward declaration (so Filesystem knows about File class)
 
 struct FatEntry{
 
@@ -34,17 +37,16 @@ struct FatEntry{
 };
 
 
-class Filesystem 
+class Filesystem : public File
 
 {
-
+	friend class File;
+	
 public: 
 
 	Filesystem(const char*);
 	FatEntry findFatEntry(uint32_t);
 	
-	
-
 	void init();
 	void fsinfo();
 	void openFile(string, string);
@@ -65,39 +67,7 @@ public:
 	int findFirstSectorOfCluster(int clusterIndex);
 	
 	int binaryAdd(int, int);
-	/*
-		Parses the integer by taking in a posiion
-	*/
-	template<typename T, const T...validArgs>
-	T parseInteger(unsigned char* const bitPosition)
-	{
-		T val = 0;
 
-		for (size_t i =0; i < sizeof(T); i++)
-		{
-			val |= static_cast<T>(static_cast<T>(bitPosition[i]) << (i*8));
-		}
-
-		constexpr auto comparable_values = initializer_list<T>({validArgs...});
-
-		if(comparable_values.size() == 0)
-		{ 
-			return val;
-		}
-		else 
-		{
-			for (auto &x: comparable_values)
-			if (x == val)
-				{
-					return val;
-				}
-				//throw exception.
-		}
-		
-		// We should never reach this point but supresses errors
-		return val;
-
-	}
 
 
 //private:
