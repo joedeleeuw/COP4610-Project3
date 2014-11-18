@@ -94,6 +94,9 @@ public:
 
 	// FATEntr info
 	FatEntry FATEntryRCluster;
+	
+	// File handler
+	File fileHandler;
 
 	int FirstDataSector;
 	int RootClusterSector;
