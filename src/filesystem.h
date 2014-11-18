@@ -18,7 +18,9 @@
 #include <iostream>
 #include <fstream>
 #include <sys/mman.h>
+
 #include "directory.h" // For directory handling
+#include "file.h"
 
 using namespace std;
 
@@ -41,6 +43,7 @@ public:
 	Filesystem(const char*);
 	FatEntry findFatEntry(uint32_t);
 	
+	
 
 	void init();
 	void fsinfo();
@@ -58,7 +61,10 @@ public:
 	void restoreFile();
 	void findRootDirectory();
 	void getFileSize();
-
+	void findDirectoryForCluster(int);
+	int findFirstSectorOfCluster(int clusterIndex);
+	
+	int binaryAdd(int, int);
 	/*
 		Parses the integer by taking in a posiion
 	*/
@@ -125,10 +131,9 @@ public:
 	int image_fd;
 	unsigned fileSize; // Stores file size
 	uint8_t *fdata;
+	
 
 	unordered_map< string, string> fileTable;
 };
-
-
 
 #endif

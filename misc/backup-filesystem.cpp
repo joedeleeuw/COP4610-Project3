@@ -1,6 +1,4 @@
 #include "filesystem.h"
-#include "directory.h"
-#include <vector>
 
 // FATENTRY
 /*
@@ -68,7 +66,7 @@ void Filesystem::init()
 	BPB_SecPerClus = parseInteger<uint8_t, 1, 2, 4, 8, 16, 32, 64, 128> (fdata + 13);
 	BPB_FATz32 = parseInteger<uint32_t>(fdata + 36);
 	BPB_TotSec32 = parseInteger<uint32_t>(fdata + 32);
-	
+	FSI_Free_Count = parseInteger<uint32_t>(fdata + 488);
 	BPB_ResvdSecCnt = parseInteger<uint32_t>(fdata + 14);
 
 	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
@@ -105,67 +103,45 @@ void Filesystem::getFileSize(){
   }
 }
 
-void Filesystem::findRootDirectory()
-{
-	findDirectoryForCluster(2);
-}
-
-/*
-	Finds the first sector based on the cluster we pass in
-*/
-int Filesystem::findFirstSectorOfCluster(int clusterIndex){
-	// Contains the local sector we're reading in NYI
-	return ((clusterIndex - 2) * BPB_SecPerClus) + FirstDataSector;
-}
-
 /*
 		We go to ThisFASecNum and start reading it
 		at offset ThisFATEntOffset. FAT will then give us
 		the next cluster number in the directory or the End
 		of Cluster Chain.
 */
-void Filesystem::findDirectoryForCluster(int clusterIndex){
-	/*struct to hold file entries.*/
-	int tempNextCluster;
-	fileRecord record;
-	std::vector<fileRecord> files;
-	
-	for(int i = 0; i < 100; i++)
-		{
-		
-		// If it's a long file name
-			if((int)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
-			for (int j = 0; j < 11; j++)
-			{
-				//fprintf(stderr,"inner counter index: %d\n", j);
-				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
-				record.name[j]= parseInteger<uint8_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + j);
-				fprintf(stdout,"%c", (char)record.name[j]);
-				
-			}
-			cout << " ";
-			//fprintf(stderr,"outer counter index: %d\n", i);
-			if ((int)record.name[1] < 10 )continue;
-			record.highCluster = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 12);
-			record.lowCluster = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 14);
-			//fprintf(stdout,"highCluster: %u ",record.highCluster);
-			//fprintf(stdout,"lowCluster: %u",record.lowCluster);
-			
-			// Gets the number that we need to pass into findFirstSectorOfCluster
-			tempNextCluster = record.highCluster + record.lowCluster;
-			// Get the sector for the contents of the file to read from it
-			int sectorToPass = findFirstSectorOfCluster(tempNextCluster);
-			// Reads the file data
-			// UNCOMMENT ME
-			//fileContainer.getFileData(sectorToPass, fdata);
-			
-			fprintf(stdout,"next cluster location: %d", tempNextCluster);
-			
-			cout << endl;
-			files.push_back(record); 
+void Filesystem::findRootDirectory()
+{
+	for(int i = 0; i < 100; i++){
+		// If it's a long file name 
+		if((int)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15){
+				continue;	
 		}
+		for(int v = 0; v < 12; v++)
+		{
+			
+			// USE PAGE 34 from fatspec.pdf here or in directories
+			unsigned char val = (unsigned char)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + v);
+			
+			// Beginning of directory found
+			if(v == 0 && val == 0xE5){
+				cout << "Begining of directory" << endl;
+				continue;
+			}
+			// End of directory found
+			else if(v == 0 && val == 0x00){
+				cout << "End of directory" << endl;
+				continue;
+			}
+			// 
+			else if (v==0)
+			
+			else{
+				fprintf(stdout, "%c",val);
+			}
+		}
+		cout << endl;
+	}
 }
-
 
 /*
 	Lists directories out.
@@ -193,25 +169,4 @@ void Filesystem::openFile(string file_name, string mode)
 
 	fileTable[file_name] = mode;
 
-}
-
-int Filesystem::binaryAdd(int firstBinary, int secondBinary)
-{
-	int result = 0;
-	int i=0,remainder = 0,sum[20];
-	while(firstBinary!=0||secondBinary!=0)
-	{
-         sum[i++] =  (firstBinary %10 + secondBinary %10 + remainder ) % 2;
-         remainder = (firstBinary %10 + secondBinary %10 + remainder ) / 2;
-         firstBinary = firstBinary/10;
-         secondBinary = secondBinary/10;
-    }
-
-    if(remainder!=0)
-         sum[i++] = remainder;
-
-    --i;
-    while(i>=0)result += sum[i--];
-
-   return result;
 }
