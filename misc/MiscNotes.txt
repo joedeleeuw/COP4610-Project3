@@ -1,0 +1,8 @@
+directory contains clusters and clusters contains records
+
+file allocation table - implements linked list. Starting with a cluster and want to
+get to next cluster. To get to the next one take current cluster, index into file allocation table
+it will give you the next cluster number. Checking if their is or isnt a next cluster or if at the
+end of your linked list.
+
+https://www.pjrc.com/tech/8051/ide/fat32.html
