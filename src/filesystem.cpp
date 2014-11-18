@@ -114,10 +114,10 @@ void Filesystem::getFileSize(){
 void Filesystem::findRootDirectory()
 {
 	/*struct to hold file entries.*/
-	
+	int tempNextCluster;
 	fileRecord record;
 	std::vector<fileRecord> files;
-	for(int i = 0; i < 32; i++)
+	for(int i = 0; i < 100; i++)
 		{
 		
 		// If it's a long file name
@@ -128,14 +128,17 @@ void Filesystem::findRootDirectory()
 				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
 				record.name[j]= parseInteger<uint8_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + j);
 				fprintf(stdout,"%c", (char)record.name[j]);
+				
 			}
 			cout << " ";
 			//fprintf(stderr,"outer counter index: %d\n", i);
+			if ((int)record.name[1] < 10 )break;
 			record.highCluster = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 12);
 			record.lowCluster = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 14);
-			fprintf(stdout,"highCluster: %u ",record.highCluster);
-			fprintf(stdout,"lowCluster: %u",record.lowCluster);
-		
+			//fprintf(stdout,"highCluster: %u ",record.highCluster);
+			//fprintf(stdout,"lowCluster: %u",record.lowCluster);
+			tempNextCluster = record.highCluster + record.lowCluster;
+			fprintf(stdout,"next cluster location: %d", tempNextCluster);
 			cout << endl;
 			files.push_back(record); 
 		}
@@ -169,4 +172,25 @@ void Filesystem::openFile(string file_name, string mode)
 
 	fileTable[file_name] = mode;
 
+}
+
+int Filesystem::binaryAdd(int firstBinary, int secondBinary)
+{
+	int result = 0;
+	int i=0,remainder = 0,sum[20];
+	while(firstBinary!=0||secondBinary!=0)
+	{
+         sum[i++] =  (firstBinary %10 + secondBinary %10 + remainder ) % 2;
+         remainder = (firstBinary %10 + secondBinary %10 + remainder ) / 2;
+         firstBinary = firstBinary/10;
+         secondBinary = secondBinary/10;
+    }
+
+    if(remainder!=0)
+         sum[i++] = remainder;
+
+    --i;
+    while(i>=0)result += sum[i--];
+
+   return result;
 }
