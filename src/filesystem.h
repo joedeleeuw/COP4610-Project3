@@ -40,7 +40,7 @@ public:
 
 	Filesystem(const char*);
 	FatEntry findFatEntry(uint32_t);
-
+	
 
 	void init();
 	void fsinfo();
