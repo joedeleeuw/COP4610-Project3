@@ -156,7 +156,8 @@ void Filesystem::findDirectoryForCluster(int clusterIndex){
 			// Get the sector for the contents of the file to read from it
 			int sectorToPass = findFirstSectorOfCluster(tempNextCluster);
 			// Reads the file data
-			fileContainer.getFileData(sectorToPass, fdata);
+			// UNCOMMENT ME
+			//fileContainer.getFileData(sectorToPass, fdata);
 			
 			fprintf(stdout,"next cluster location: %d", tempNextCluster);
 			

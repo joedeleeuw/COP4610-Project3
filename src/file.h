@@ -6,7 +6,7 @@
 
 using namespace std;
 
-class File: public Filesystem {
+class File {
 
 public:
 
@@ -20,10 +20,11 @@ public:
         int i = 0;
         // We loop through till temp becomes the end of the cluster
         while(i < 1000){
-            int temp = parseInteger<uint8_t>(fdata + clusterToGet); 
+            // UNCOMMENT ME
+            //int temp = parseInteger<uint8_t>(fdata + clusterToGet); 
             i += 8;
         
-            cout << temp;
+            //cout << temp;
         }
         cout << endl;
         

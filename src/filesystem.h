@@ -18,6 +18,7 @@
 #include <iostream>
 #include <fstream>
 #include <sys/mman.h>
+
 #include "directory.h" // For directory handling
 #include "file.h"
 
@@ -42,7 +43,7 @@ public:
 	Filesystem(const char*);
 	FatEntry findFatEntry(uint32_t);
 	
-	friend class File;
+	
 
 	void init();
 	void fsinfo();
@@ -130,11 +131,9 @@ public:
 	int image_fd;
 	unsigned fileSize; // Stores file size
 	uint8_t *fdata;
-	File fileContainer; // Contains instance of file
+	
 
 	unordered_map< string, string> fileTable;
 };
-
-
 
 #endif
