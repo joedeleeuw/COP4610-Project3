@@ -107,8 +107,9 @@ public:
 	int image_fd;
 	unsigned fileSize; // Stores file size
 	uint8_t *fdata;
+	string workingDirectory;
 	
-
+	vector<fileRecord> files;
 	unordered_map< string, string> fileTable;
 };
 

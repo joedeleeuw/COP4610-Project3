@@ -50,6 +50,7 @@ Filesystem::Filesystem(const char* name)
 void Filesystem::init()
 {
 	// Get the file size first
+	workingDirectory = "Root Directory";
 	getFileSize();
 	
 	int offset = 0;
@@ -141,7 +142,33 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex){
 	getRootDirectoryContents(secondSectorClusterRD);
 }
 
+void Filesystem::changeDirectory(string directoryName)
+{
+	cout << directoryName << endl;
+	for(unsigned int i = 0; i < files.size(); i++)
+	{
+		string recordName;
+		
+		for(int j = 0; j < 11; j++)
+		{
+			char temp = files[i].name[j];
+			recordName.push_back(temp);
+			
+		}	
+		fprintf(stdout, "%s\n", recordName.c_str());
+		
+		//fprintf()
+		//cout << "Directory Name: " << directoryName << endl;
 
+		if(recordName == directoryName)
+		{
+			cout << "directory found and hopefully we can go into it" << endl;
+		} 
+	
+	}
+	
+		//cout <<"Vector Size: " <<files.size() << endl;
+}
 /*
 	Lists directories out.
 */
@@ -197,7 +224,7 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 
 	int fileClusterLocation;
 	fileRecord record;
-	std::vector<fileRecord> files;
+	
 	cout << "cluster sector"<<FirstDataSector << endl;
 	//number of records, had to divide by 32, because we were reading too far.
 	for(int i = 0; i < BPB_BytsPerSec/32; i++)
@@ -211,8 +238,8 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 			{
 				//fprintf(stderr,"inner counter index: %d\n", j);
 				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
-				record.name[j]= parseInteger<uint8_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + j);
-				fprintf(stdout,"%c", (char)record.name[j]);
+				record.name[j]= (char)parseInteger<uint8_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + j);
+				fprintf(stdout,"%c", record.name[j]);
 				
 			}
 			cout << " ";
@@ -220,14 +247,13 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 			if ((int)record.name[1] < 10 )continue;
 			
 			//refer to the filesystem spec instead of the dumb slides, the offsets were wrong, and were ORing time stamps.
+			record.attr = parseInteger<uint8_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 11);
 			record.highCluster = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 20);
 			record.lowCluster = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 26);
 			
 			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
 			record.highCluster <<= 16;
 			fileClusterLocation = record.highCluster | record.lowCluster;
-			//fprintf(stdout,"highCluster: %u ",record.highCluster);
-			//fprintf(stdout,"lowCluster: %u",record.lowCluster);
 			
 			// Gets the number that we need to pass into findFirstSectorOfCluster
 			fileClusterLocation = record.highCluster + record.lowCluster;
@@ -236,13 +262,11 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 			// Reads the file data
 			//fileHandler.getFileData(sectorToPass, fdata);
 			
+			fprintf(stdout,"Entry Type: %x ", record.attr);
 			fprintf(stdout,"next cluster location: %d", fileClusterLocation);
 			
 			cout << endl;
 			files.push_back(record); 
 		}
-
-
-
 
 }
