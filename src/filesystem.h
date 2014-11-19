@@ -63,7 +63,8 @@ public:
 	void restoreFile();
 	void findRootDirectory();
 	void getFileSize();
-	void findDirectoryForCluster(int);
+	void findDirectoriesForCluster(int);
+	void getRootDirectoryContents(int);
 	int findFirstSectorOfCluster(int clusterIndex);
 	
 	int binaryAdd(int, int);
@@ -97,8 +98,10 @@ public:
 	
 	// File handler
 	File fileHandler;
-
 	int FirstDataSector;
+	int bytesPerCluster;
+	int firstSectorClusterRD;
+	int secondSectorClusterRD;
 	int RootClusterSector;
 	const char* fname; // file name
 	int image_fd;
