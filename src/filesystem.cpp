@@ -77,12 +77,17 @@ void Filesystem::init()
 	fprintf(stdout,"First Data Sector %u ",RootClusterSector);
 	
 	// Gets the FATEntry information
-	FATEntryRCluster = this->findFatEntry(RootClusterSector);
+	FATEntryRCluster = this->findFatEntry(2);
 
 	
-	uint32_t tempNextCluster = parseInteger<uint32_t>(fdata +FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum);
+	uint32_t tempNextCluster = parseInteger<uint32_t>(fdata + FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum * BPB_BytsPerSec);
+	fprintf(stdout,"Next possible cluster value %x\n", tempNextCluster);
 	
-	fprintf(stdout,"Next possible cluster value %u\n", tempNextCluster);
+	FatEntry temp = this->findFatEntry(tempNextCluster);
+	uint32_t lastCluster = parseInteger<uint32_t>(fdata + temp.FATOffset + temp.FATsecNum * BPB_BytsPerSec);
+	fprintf(stdout,"Last possible cluster value %x\n", lastCluster);
+	
+
 }
 
 /*
@@ -130,7 +135,7 @@ void Filesystem::findDirectoryForCluster(int clusterIndex){
 	fileRecord record;
 	std::vector<fileRecord> files;
 	
-	for(int i = 0; i < 100; i++)
+	for(int i = 0; i < 500; i++)
 		{
 		
 		// If it's a long file name
