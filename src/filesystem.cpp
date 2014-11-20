@@ -179,6 +179,9 @@ void Filesystem::changeDirectory(string directoryName)
 		// cout << "Directory Name: " << directoryName << endl;
 		// cout << "Directory Name: " << directoryName.length() << endl;
 
+		// Trim any . since it wouldn't be stored in fat file system
+		directoryName.erase(remove(directoryName.begin(), directoryName.end(), '.'), directoryName.end());
+		
 		// Check if record is found, case insensitive comparison)
 		// Change directory and record name to uppercase for case insensitive comparison
 		transform(recordName.begin(), recordName.end(), recordName.begin(),::toupper);
