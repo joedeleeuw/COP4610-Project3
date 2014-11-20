@@ -72,6 +72,9 @@ void Filesystem::init()
 	BPB_ResvdSecCnt = parseInteger<uint32_t>(fdata + 14);
 
 	bytesPerCluster = BPB_BytsPerSec * BPB_SecPerClus;
+	
+	// Now we read in the root directory
+	findRootDirectory();
 }
 
 /*
@@ -142,29 +145,56 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex){
 	getRootDirectoryContents(secondSectorClusterRD);
 }
 
+/*
+	Changes the directory and checks if it exists.
+	
+	TODO NYI - Need to check if directory would be transformed into version of what
+	we are comparing it against, SEE FAT documentation.
+*/
 void Filesystem::changeDirectory(string directoryName)
 {
-	cout << directoryName << endl;
+	bool dirFound = false;
+	/*
+		We must note that the directory name the user enters may just be RED 
+		(no spaces) but the stored value may contain spaces so we must know when
+		to ignore that.
+	*/
 	for(unsigned int i = 0; i < files.size(); i++)
 	{
 		string recordName;
 		
+		// Go through file name one character at a time
+		// and add its name to the recordName
 		for(int j = 0; j < 11; j++)
 		{
-			char temp = files[i].name[j];
-			recordName.push_back(temp);
-			
+			char readInChar = files[i].name[j];
+			if(readInChar != ' ' && (int)readInChar != 16) // Skip if weird char at end or space
+				recordName.push_back(readInChar);
 		}	
-		fprintf(stdout, "%s\n", recordName.c_str());
-		
-		//fprintf()
-		//cout << "Directory Name: " << directoryName << endl;
 
+		// cout << "Record Name: " << recordName << endl;
+		// cout << "Record Name: " << recordName.length() << endl;
+		
+		// //fprintf()
+		// cout << "Directory Name: " << directoryName << endl;
+		// cout << "Directory Name: " << directoryName.length() << endl;
+
+		// Check if record is found, case insensitive comparison)
+		// Change directory and record name to uppercase for case insensitive comparison
+		transform(recordName.begin(), recordName.end(), recordName.begin(),::toupper);
+		transform(directoryName.begin(), directoryName.end(), directoryName.begin(),::toupper);
 		if(recordName == directoryName)
 		{
-			cout << "directory found and hopefully we can go into it" << endl;
-		} 
+			dirFound = true; // Directories found
+		}
 	
+	}
+	
+	if(dirFound){
+		cout << "directory found and hopefully we can go into it" << endl;
+	}else{
+		cout << "Directory " << directoryName << " was not found" << endl;
+		return;
 	}
 	
 		//cout <<"Vector Size: " <<files.size() << endl;

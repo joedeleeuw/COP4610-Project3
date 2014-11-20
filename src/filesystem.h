@@ -18,6 +18,7 @@
 #include <iostream>
 #include <fstream>
 #include <sys/mman.h>
+#include <algorithm> // For transform
 
 // Custom classes
 #include "file.h"

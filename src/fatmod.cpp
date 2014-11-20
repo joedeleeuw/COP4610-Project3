@@ -133,7 +133,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 			printf("%s\n", "wrong amount of arguments supplied");
 		}else
 		{
-		fs->changeDirectory(userArgs[1]);	
+			fs->changeDirectory(userArgs[1]);	
 		}
 	}
 	else if (userArgs[0].compare("ls") == 0)
