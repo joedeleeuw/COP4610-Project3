@@ -66,6 +66,8 @@ public:
 	void getFileSize();
 	void findDirectoriesForCluster(int);
 	void getRootDirectoryContents(int);
+	void getDirectoryClusterNumber(string);
+	void PrintCurrentDirectory(int);
 	int findFirstSectorOfCluster(int clusterIndex);
 	
 	int binaryAdd(int, int);
@@ -99,6 +101,8 @@ public:
 	
 	// File handler
 	File fileHandler;
+	//combination of high and low cluster for an individual record.
+	
 	int FirstDataSector;
 	int bytesPerCluster;
 	int firstSectorClusterRD;
@@ -111,6 +115,7 @@ public:
 	string workingDirectory;
 	
 	vector<fileRecord> files;
+	vector<fileRecord> currentDir;
 	unordered_map< string, string> fileTable;
 };
 

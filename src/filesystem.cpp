@@ -99,29 +99,7 @@ void Filesystem::getFileSize(){
 
 void Filesystem::findRootDirectory()
 {
-	findDirectoriesForCluster(2);
-}
-
-/*
-	Finds the first sector based on the cluster we pass in
-*/
-int Filesystem::findFirstSectorOfCluster(int clusterIndex){
-	// Contains the local sector we're reading in NYI
-	return ((clusterIndex - 2) * BPB_SecPerClus) + FirstDataSector;
-}
-
-/*
-		We go to ThisFASecNum and start reading it
-		at offset ThisFATEntOffset. FAT will then give us
-		the next cluster number in the directory or the End
-		of Cluster Chain.
-*/
-void Filesystem::findDirectoriesForCluster(int clusterIndex){
-	/*struct to hold file entries.*/
-	
-
 	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
-	//First sector of the root cluster
 	firstSectorClusterRD = findFirstSectorOfCluster(BPB_RootClus);
 	fprintf(stdout,"First Sector of First RD cluster %u ",firstSectorClusterRD);
 	
@@ -140,9 +118,49 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex){
 
 	uint32_t EoC = parseInteger<uint32_t>(fdata + temp.FATOffset + temp.FATsecNum * BPB_BytsPerSec);
 	fprintf(stdout,"EOC Marker hit %x\n", EoC);
-
 	getRootDirectoryContents(firstSectorClusterRD);
 	getRootDirectoryContents(secondSectorClusterRD);
+
+}
+
+/*
+	Finds the first sector based on the cluster we pass in
+*/
+int Filesystem::findFirstSectorOfCluster(int clusterIndex){
+	// Contains the local sector we're reading in NYI
+	return ((clusterIndex - 2) * BPB_SecPerClus) + FirstDataSector;
+}
+
+/*Pass this function a cluster number, it will find the first data sector for the cluster
+as well as check to see if there is another cluster associated with it in the FAT
+Call function to read from data sector in this function.
+*/
+
+void Filesystem::findDirectoriesForCluster(int clusterIndex)
+{
+	
+	int dataSector;
+	uint32_t nextCluster;
+	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
+	while(clusterIndex != 268435455)
+	{
+		cout << "test" << endl;
+		dataSector = findFirstSectorOfCluster(clusterIndex);
+		// Gets the FATEntry for the location of the next directory cluster
+		FATEntryRCluster = this->findFatEntry(clusterIndex);
+		//The second cluster number of the root directory. 
+		nextCluster = parseInteger<uint32_t>(fdata + FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum * BPB_BytsPerSec);
+		clusterIndex = nextCluster;
+		//this will be called for as many additional clusters there are for a directory.
+		PrintCurrentDirectory(dataSector);
+	}	
+	
+	fprintf(stdout,"EOC Marker hit %x\n", clusterIndex);
+
+	
+	
+
+	
 }
 
 /*
@@ -186,16 +204,20 @@ void Filesystem::changeDirectory(string directoryName)
 		// Change directory and record name to uppercase for case insensitive comparison
 		transform(recordName.begin(), recordName.end(), recordName.begin(),::toupper);
 		transform(directoryName.begin(), directoryName.end(), directoryName.begin(),::toupper);
-		if(recordName == directoryName)
+		if(recordName == directoryName && files[i].attr == 16 )
 		{
 			dirFound = true; // Directories found
 		}
 	
 	}
 	
-	if(dirFound){
+	if(dirFound)
+	{
 		cout << "Directory " << directoryName << " was found" << endl;
-	}else{
+		workingDirectory = "directoryName";
+	}
+	else
+	{
 		cout << "Directory " << directoryName << " was not found" << endl;
 		return;
 	}
@@ -207,7 +229,7 @@ void Filesystem::changeDirectory(string directoryName)
 */
 void Filesystem::listDirectory(string dir_name)
 {
-	
+	getDirectoryClusterNumber(dir_name);
 }
 
 /*
@@ -255,7 +277,7 @@ int Filesystem::binaryAdd(int firstBinary, int secondBinary)
 void Filesystem::getRootDirectoryContents(int FirstDataSector)
 {
 
-	int fileClusterLocation;
+	 
 	fileRecord record;
 	
 	cout << "cluster sector"<<FirstDataSector << endl;
@@ -286,20 +308,82 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 			
 			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
 			record.highCluster <<= 16;
-			fileClusterLocation = record.highCluster | record.lowCluster;
+			record.fClusterLocation = record.highCluster | record.lowCluster;
 			
 			// Gets the number that we need to pass into findFirstSectorOfCluster
-			fileClusterLocation = record.highCluster + record.lowCluster;
+			//fClusterLocation = record.highCluster + record.lowCluster;
+			
 			// Get the sector for the contents of the file to read from it
-			int sectorToPass = findFirstSectorOfCluster(fileClusterLocation);
+			int sectorToPass = findFirstSectorOfCluster(record.fClusterLocation);
 			// Reads the file data
 			//fileHandler.getFileData(sectorToPass, fdata);
 			
 			fprintf(stdout,"Entry Type: %x ", record.attr);
-			fprintf(stdout,"next cluster location: %d", fileClusterLocation);
+			fprintf(stdout,"next cluster location: %d", record.fClusterLocation);
 			
 			cout << endl;
+			record.currentFolder = workingDirectory;
 			files.push_back(record); 
 		}
 
+}
+
+//this function gets the cluster number for a directory from the vector, and then calls the function to get the data sector and future clusters for the sectors.
+void Filesystem::getDirectoryClusterNumber(string directory)
+{
+	string recordName;
+	for(unsigned int i = 0; i < files.size(); i++)
+		{
+			if((int)files[i].attr == 16 )
+			{
+				for(int j = 0; j < 11; j++)
+				{
+					char readInChar = files[i].name[j];
+					if(readInChar != ' ' && (int)readInChar != 16) // Skip if weird char at end or space
+					recordName.push_back(readInChar);
+				}	
+				if(recordName == directory)
+				{
+					findDirectoriesForCluster(files[i].fClusterLocation);
+				}
+			}
+	}
+
+}
+/*This function takes in the data sector from a directory cluster as an argument, and then prints out the records in that cluster
+this funciton is called n amount of times, where n is the amount of clusters associated with a directory.*/
+void Filesystem::PrintCurrentDirectory(int directoryDataSector)
+{
+		fileRecord dirRecord;
+	for(int i = 0; i < BPB_BytsPerSec/32; i++)
+		{
+		
+		// If it's a long file name, skip over the record.
+			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
+			//if the record is empty, then break, because we have reached the end of the sector, or cluster? does it really matter?
+			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0) == 0)break;	
+			for (int j = 0; j < 11; j++)
+			{
+				//fprintf(stderr,"inner counter index: %d\n", j);
+				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
+				dirRecord.name[j] = (char)parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + j);
+				fprintf(stdout,"%c", dirRecord.name[j]);
+				
+			}
+			cout << " ";
+			//fprintf(stderr,"outer counter index: %d\n", i);
+			if ((int)dirRecord.name[1] < 10 )continue;
+			
+			//refer to the filesystem spec instead of the dumb slides, the offsets were wrong, and were ORing time stamps.
+			dirRecord.attr = parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11);
+			dirRecord.highCluster = parseInteger<uint16_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 20);
+			dirRecord.lowCluster = parseInteger<uint16_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 26);
+			
+			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
+			dirRecord.highCluster <<= 16;
+			dirRecord.fClusterLocation = dirRecord.highCluster | dirRecord.lowCluster;
+			currentDir.push_back(dirRecord);
+			
+			cout << endl;
+	}
 }
