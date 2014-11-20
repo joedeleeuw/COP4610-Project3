@@ -194,7 +194,7 @@ void Filesystem::changeDirectory(string directoryName)
 	}
 	
 	if(dirFound){
-		cout << "directory found and hopefully we can go into it" << endl;
+		cout << "Directory " << directoryName << " was found" << endl;
 	}else{
 		cout << "Directory " << directoryName << " was not found" << endl;
 		return;
@@ -271,7 +271,7 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 			{
 				//fprintf(stderr,"inner counter index: %d\n", j);
 				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
-				record.name[j]= (char)parseInteger<uint8_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + j);
+				record.name[j] = (char)parseInteger<uint8_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + j);
 				fprintf(stdout,"%c", record.name[j]);
 				
 			}
