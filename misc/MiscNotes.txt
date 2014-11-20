@@ -6,3 +6,6 @@ it will give you the next cluster number. Checking if their is or isnt a next cl
 end of your linked list.
 
 https://www.pjrc.com/tech/8051/ide/fat32.html
+
+IMPORTANT - We need to read the file contents of the directory that is our active directory. So need to add some function for that
+probably in change directory.
