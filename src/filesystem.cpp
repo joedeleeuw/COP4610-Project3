@@ -186,8 +186,7 @@ void Filesystem::changeDirectory(string directoryName)
 		for(int j = 0; j < 11; j++)
 		{
 			char readInChar = files[i].name[j];
-			if(readInChar != ' ' && (int)readInChar != 16) // Skip if weird char at end or space
-				recordName.push_back(readInChar);
+			recordName.push_back(readInChar);
 		}	
 
 		// cout << "Record Name: " << recordName << endl;
@@ -197,13 +196,10 @@ void Filesystem::changeDirectory(string directoryName)
 		// cout << "Directory Name: " << directoryName << endl;
 		// cout << "Directory Name: " << directoryName.length() << endl;
 
-		// Trim any . since it wouldn't be stored in fat file system
-		directoryName.erase(remove(directoryName.begin(), directoryName.end(), '.'), directoryName.end());
+		// Trims and converts to uppercase the record and directoryname
+		recordName = normalizeToUppercase(recordName, ' ');
+		directoryName = normalizeToUppercase(directoryName, '.');
 		
-		// Check if record is found, case insensitive comparison)
-		// Change directory and record name to uppercase for case insensitive comparison
-		transform(recordName.begin(), recordName.end(), recordName.begin(),::toupper);
-		transform(directoryName.begin(), directoryName.end(), directoryName.begin(),::toupper);
 		if(recordName == directoryName && files[i].attr == 16 )
 		{
 			dirFound = true; // Directories found
@@ -339,9 +335,14 @@ void Filesystem::getDirectoryClusterNumber(string directory)
 				for(int j = 0; j < 11; j++)
 				{
 					char readInChar = files[i].name[j];
-					if(readInChar != ' ' && (int)readInChar != 16) // Skip if weird char at end or space
-					recordName.push_back(readInChar);
+					if(readInChar != ' ')
+						recordName.push_back(readInChar);
 				}	
+				
+				// Trims and converts to uppercase the record and directoryname
+				recordName = normalizeToUppercase(recordName, ' ');
+				directory = normalizeToUppercase(directory, '.');
+				
 				if(recordName == directory)
 				{
 					findDirectoriesForCluster(files[i].fClusterLocation);
