@@ -59,6 +59,7 @@ public:
 	void changeDirectory(string);
 	void listDirectory(string); // ls command
 	void makeDirectory(string);
+	bool directoryExists(string);
 	void removeDirectory(string);
 	void entrySize(string);
 	void restoreFile();

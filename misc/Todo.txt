@@ -1,1 +1,7 @@
 TODO
+
+
+Commands done 
+fsinfo 
+ls
+cd

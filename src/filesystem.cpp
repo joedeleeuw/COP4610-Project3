@@ -168,45 +168,10 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex)
 */
 void Filesystem::changeDirectory(string directoryName)
 {
-	bool dirFound = false;
-	/*
-		We must note that the directory name the user enters may just be RED 
-		(no spaces) but the stored value may contain spaces so we must know when
-		to ignore that.
-	*/
-	for(unsigned int i = 0; i < files.size(); i++)
+	// If the directory exists (pretty self explanatory)
+	if(directoryExists(directoryName))
 	{
-		string recordName;
-		
-		// Go through file name one character at a time
-		// and add its name to the recordName
-		for(int j = 0; j < 11; j++)
-		{
-			char readInChar = files[i].name[j];
-			recordName.push_back(readInChar);
-		}	
-
-		// cout << "Record Name: " << recordName << endl;
-		// cout << "Record Name: " << recordName.length() << endl;
-		
-		// //fprintf()
-		// cout << "Directory Name: " << directoryName << endl;
-		// cout << "Directory Name: " << directoryName.length() << endl;
-
-		// Trims and converts to uppercase the record and directoryname
-		recordName = normalizeToUppercase(recordName, ' ');
-		directoryName = normalizeToUppercase(directoryName, '.');
-		
-		if(recordName == directoryName && files[i].attr == 16 )
-		{
-			dirFound = true; // Directories found
-		}
-	
-	}
-	
-	if(dirFound)
-	{
-		cout << "Directory " << directoryName << " was found" << endl;
+		cout << "Working directory changed to " << directoryName  << endl;
 		workingDirectory = "directoryName";
 	}
 	else
@@ -390,3 +355,61 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector)
 	}
 }
 
+/*
+	Checks if the directory exists in the current working directory
+*/
+bool Filesystem::directoryExists(string directoryName){
+	bool dirFound = false;
+	/*
+		We must note that the directory name the user enters may just be RED 
+		(no spaces) but the stored value may contain spaces so we must know when
+		to ignore that.
+	*/
+	for(unsigned int i = 0; i < files.size(); i++)
+	{
+		string recordName;
+		
+		// Go through file name one character at a time
+		// and add its name to the recordName
+		for(int j = 0; j < 11; j++)
+		{
+			char readInChar = files[i].name[j];
+			recordName.push_back(readInChar);
+		}	
+
+		// cout << "Record Name: " << recordName << endl;
+		// cout << "Record Name: " << recordName.length() << endl;
+		
+		// //fprintf()
+		// cout << "Directory Name: " << directoryName << endl;
+		// cout << "Directory Name: " << directoryName.length() << endl;
+
+		// Trims and converts to uppercase the record and directoryname
+		recordName = normalizeToUppercase(recordName, ' ');
+		directoryName = normalizeToUppercase(directoryName, '.');
+		
+		if(recordName == directoryName && files[i].attr == 16 )
+		{
+			dirFound = true; // Directories found
+			break;
+		}
+	
+	}
+	return dirFound;
+}
+
+/*
+    Creates a directory with the passed in directoryName,
+    also checks if the directory already exists in the current
+    working directory
+*/
+void Filesystem::makeDirectory(string directoryName){
+    // Check if the directory already exists
+    if(directoryExists(directoryName)){
+    	cout << "The directory " << directoryName << " already exists." << endl;
+    }
+    // Otherwise we create the directory
+    else{
+    	
+    }
+}
