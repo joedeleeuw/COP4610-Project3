@@ -114,9 +114,9 @@ void Filesystem::findRootDirectory()
 	//First sector of the second cluster of the root directory.
 	secondSectorClusterRD = findFirstSectorOfCluster(secondRootCluster);
 	// Gets the FATEntry for the location of the next Root Directory Cluster(EOC)
-	FatEntry temp = this->findFatEntry(secondRootCluster);
+	//FatEntry temp = this->findFatEntry(secondRootCluster);
 
-	uint32_t EoC = parseInteger<uint32_t>(fdata + temp.FATOffset + temp.FATsecNum * BPB_BytsPerSec);
+	//uint32_t EoC = parseInteger<uint32_t>(fdata + temp.FATOffset + temp.FATsecNum * BPB_BytsPerSec);
 	//fprintf(stdout,"EOC Marker hit %x\n", EoC);
 	getRootDirectoryContents(firstSectorClusterRD);
 	getRootDirectoryContents(secondSectorClusterRD);
@@ -144,7 +144,7 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex)
 	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
 	while(clusterIndex != 268435455)
 	{
-		cout << "test" << endl;
+		
 		dataSector = findFirstSectorOfCluster(clusterIndex);
 		// Gets the FATEntry for the location of the next directory cluster
 		FATEntryRCluster = this->findFatEntry(clusterIndex);
@@ -156,9 +156,6 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex)
 	}	
 	
 	fprintf(stdout,"EOC Marker hit %x\n", clusterIndex);
-
-	
-	
 
 	
 }
@@ -310,7 +307,7 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 			//fClusterLocation = record.highCluster + record.lowCluster;
 			
 			// Get the sector for the contents of the file to read from it
-			int sectorToPass = findFirstSectorOfCluster(record.fClusterLocation);
+			//int sectorToPass = findFirstSectorOfCluster(record.fClusterLocation);
 			// Reads the file data
 			//fileHandler.getFileData(sectorToPass, fdata);
 			
@@ -359,7 +356,7 @@ void Filesystem::getDirectoryClusterNumber(string directory)
 this funciton is called n amount of times, where n is the amount of clusters associated with a directory.*/
 void Filesystem::PrintCurrentDirectory(int directoryDataSector)
 {
-		fileRecord dirRecord;
+	fileRecord dirRecord;
 	for(int i = 0; i < BPB_BytsPerSec/32; i++)
 		{
 		
@@ -387,8 +384,9 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector)
 			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
 			dirRecord.highCluster <<= 16;
 			dirRecord.fClusterLocation = dirRecord.highCluster | dirRecord.lowCluster;
-			currentDir.push_back(dirRecord);
+			files.push_back(dirRecord);
 			
 			cout << endl;
 	}
 }
+
