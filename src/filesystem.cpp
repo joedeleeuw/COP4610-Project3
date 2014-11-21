@@ -101,14 +101,14 @@ void Filesystem::findRootDirectory()
 {
 	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
 	firstSectorClusterRD = findFirstSectorOfCluster(BPB_RootClus);
-	fprintf(stdout,"First Sector of First RD cluster %u ",firstSectorClusterRD);
+	//fprintf(stdout,"First Sector of First RD cluster %u ",firstSectorClusterRD);
 	
 	// Gets the FATEntry for the location of the next Root Directory Cluster
 	FATEntryRCluster = this->findFatEntry(2);
 
 	//The second cluster number of the root directory. 
 	uint32_t secondRootCluster = parseInteger<uint32_t>(fdata + FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum * BPB_BytsPerSec);
-	fprintf(stdout,"Next RD cluster value %x\n", secondRootCluster);
+	//fprintf(stdout,"Next RD cluster value %x\n", secondRootCluster);
 	
 
 	//First sector of the second cluster of the root directory.
@@ -117,7 +117,7 @@ void Filesystem::findRootDirectory()
 	FatEntry temp = this->findFatEntry(secondRootCluster);
 
 	uint32_t EoC = parseInteger<uint32_t>(fdata + temp.FATOffset + temp.FATsecNum * BPB_BytsPerSec);
-	fprintf(stdout,"EOC Marker hit %x\n", EoC);
+	//fprintf(stdout,"EOC Marker hit %x\n", EoC);
 	getRootDirectoryContents(firstSectorClusterRD);
 	getRootDirectoryContents(secondSectorClusterRD);
 
@@ -332,6 +332,9 @@ void Filesystem::getDirectoryClusterNumber(string directory)
 		{
 			if((int)files[i].attr == 16 )
 			{
+				// Reset recordName
+				recordName = "";
+				
 				for(int j = 0; j < 11; j++)
 				{
 					char readInChar = files[i].name[j];
@@ -346,6 +349,7 @@ void Filesystem::getDirectoryClusterNumber(string directory)
 				if(recordName == directory)
 				{
 					findDirectoriesForCluster(files[i].fClusterLocation);
+					break;
 				}
 			}
 	}
