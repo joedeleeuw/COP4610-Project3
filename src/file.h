@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -65,20 +68,7 @@ public:
         
     }
     
-    /*
-    Converts the string to uppercase and trims the proper character
-	*/
-	string normalizeToUppercase(string valueToNormalize, char characterToRemove = '?'){
-	        if(characterToRemove != '?'){
-	    	    // Trim the character to remove if one is passed in
-			    valueToNormalize.erase(remove(valueToNormalize.begin(), valueToNormalize.end(), characterToRemove), valueToNormalize.end());   
-	        }
-			
-			// Uppercase record
-			transform(valueToNormalize.begin(), valueToNormalize.end(), valueToNormalize.begin(),::toupper);
-			
-			return valueToNormalize;
-	}
+	string normalizeToUppercase(string valueToNormalize, char characterToRemove = '?');
 
     // Variables
     vector<uint8_t> fileData;
