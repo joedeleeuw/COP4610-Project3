@@ -136,7 +136,7 @@ as well as check to see if there is another cluster associated with it in the FA
 Call function to read from data sector in this function.
 */
 
-void Filesystem::findDirectoriesForCluster(int clusterIndex)
+void Filesystem::findDirectoriesForCluster(int clusterIndex, bool printOut = false)
 {
 	
 	int dataSector;
@@ -152,7 +152,8 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex)
 		nextCluster = parseInteger<uint32_t>(fdata + FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum * BPB_BytsPerSec);
 		clusterIndex = nextCluster;
 		//this will be called for as many additional clusters there are for a directory.
-		PrintCurrentDirectory(dataSector);
+		if(printOut)
+			PrintCurrentDirectory(dataSector);
 	}	
 	
 	fprintf(stdout,"EOC Marker hit %x\n", clusterIndex);
@@ -182,12 +183,16 @@ void Filesystem::changeDirectory(string directoryName)
 	
 		//cout <<"Vector Size: " <<files.size() << endl;
 }
+
 /*
 	Lists directories out.
 */
 void Filesystem::listDirectory(string dir_name)
 {
-	getDirectoryClusterNumber(dir_name);
+	// If we didn't find the directory
+	if(!getDirectoryClusterNumber(dir_name)){
+		cout << "Directory " << dir_name << " not found." << endl;
+	}
 }
 
 /*
@@ -235,15 +240,16 @@ int Filesystem::binaryAdd(int firstBinary, int secondBinary)
 void Filesystem::getRootDirectoryContents(int FirstDataSector)
 {
 
-	 
+	string recordName;
 	fileRecord record;
 	
+	record.currentFolder = "root";
 	cout << "cluster sector"<<FirstDataSector << endl;
 	//number of records, had to divide by 32, because we were reading too far.
 	for(int i = 0; i < BPB_BytsPerSec/32; i++)
 		{
-		
-		// If it's a long file name, skip over the record.
+			recordName="";
+			// If it's a long file name, skip over the record.
 			if((int)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
 			//if the record is empty, then break, because we have reached the end of the sector, or cluster? does it really matter?
 			if((int)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 0) == 0)break;	
@@ -287,9 +293,10 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 }
 
 //this function gets the cluster number for a directory from the vector, and then calls the function to get the data sector and future clusters for the sectors.
-void Filesystem::getDirectoryClusterNumber(string directory)
+bool Filesystem::getDirectoryClusterNumber(string directory)
 {
 	string recordName;
+	bool foundRecord = false;
 	for(unsigned int i = 0; i < files.size(); i++)
 		{
 			// If direcory
@@ -311,11 +318,13 @@ void Filesystem::getDirectoryClusterNumber(string directory)
 				
 				if(recordName == directory)
 				{
-					findDirectoriesForCluster(files[i].fClusterLocation);
+					findDirectoriesForCluster(files[i].fClusterLocation, true);
+					foundRecord = true;
 					break;
 				}
 			}
 	}
+	return foundRecord;
 
 }
 /*This function takes in the data sector from a directory cluster as an argument, and then prints out the records in that cluster
@@ -346,7 +355,7 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector)
 			dirRecord.attr = parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11);
 			dirRecord.highCluster = parseInteger<uint16_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 20);
 			dirRecord.lowCluster = parseInteger<uint16_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 26);
-			
+		 
 			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
 			dirRecord.highCluster <<= 16;
 			dirRecord.fClusterLocation = dirRecord.highCluster | dirRecord.lowCluster;
@@ -393,7 +402,7 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 		if(recordName == directoryName && files[i].attr == 16 )
 		{
 			dirFound = true; // Directories found
-			findDirectoriesForCluster(files[i].fClusterLocation);
+			findDirectoriesForCluster(files[i].fClusterLocation, false);
 			break;
 		}
 	
@@ -449,6 +458,8 @@ bool Filesystem::directoryExists(string directoryName){
     Creates a directory with the passed in directoryName,
     also checks if the directory already exists in the current
     working directory
+    
+    NYI
 */
 void Filesystem::makeDirectory(string directoryName){
     // Check if the directory already exists
@@ -456,6 +467,24 @@ void Filesystem::makeDirectory(string directoryName){
     	cout << "The directory " << directoryName << " already exists." << endl;
     }
     // Otherwise we create the directory
+    else{
+    	
+    }
+}
+
+/*
+    Removes a directory with the passed in directoryName,
+    also checks if the directory already exists in the current
+    working directory
+    
+    NYI
+*/
+void Filesystem::removeDirectory(string directoryName){
+    // Check if the directory already exists
+    if(directoryExists(directoryName)){
+    	cout << "The directory " << directoryName << " already exists." << endl;
+    }
+    // Otherwise we remove the directory
     else{
     	
     }

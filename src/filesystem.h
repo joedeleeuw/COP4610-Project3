@@ -57,18 +57,18 @@ public:
 	void writetoFile(string, unsigned int, string);
 	void removeFile(string);
 	void changeDirectory(string);
+	void removeDirectory(string);
 	void listDirectory(string); // ls command
 	void makeDirectory(string);
 	bool directoryExists(string);
 	bool directoryExistsAndChangeTo(string);
-	void removeDirectory(string);
 	void entrySize(string);
 	void restoreFile();
 	void findRootDirectory();
 	void getFileSize();
-	void findDirectoriesForCluster(int);
+	void findDirectoriesForCluster(int, bool);
 	void getRootDirectoryContents(int);
-	void getDirectoryClusterNumber(string);
+	bool getDirectoryClusterNumber(string);
 	void PrintCurrentDirectory(int);
 	int findFirstSectorOfCluster(int clusterIndex);
 	
