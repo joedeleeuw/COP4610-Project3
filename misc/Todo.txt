@@ -1,5 +1,11 @@
 TODO
 
+Known bugs
+Cant cd without doing ls first. We need to just abstract the ls code a bit more.
+And then intergrate that with cd. At the moment cd only checks if the directory
+exists and doesn't do much else.
+I (Justin) will be doing this on Saturday. I've been fried brain wise but I know
+how we can approach the fix.
 
 Commands done 
 fsinfo 

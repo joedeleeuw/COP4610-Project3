@@ -172,7 +172,7 @@ void Filesystem::changeDirectory(string directoryName)
 	if(directoryExists(directoryName))
 	{
 		cout << "Working directory changed to " << directoryName  << endl;
-		workingDirectory = "directoryName";
+		workingDirectory = directoryName;
 	}
 	else
 	{
