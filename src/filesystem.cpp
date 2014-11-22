@@ -169,7 +169,7 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex)
 void Filesystem::changeDirectory(string directoryName)
 {
 	// If the directory exists (pretty self explanatory)
-	if(directoryExists(directoryName))
+	if(directoryExistsAndChangeTo(directoryName))
 	{
 		cout << "Working directory changed to " << directoryName  << endl;
 		workingDirectory = directoryName;
@@ -292,6 +292,7 @@ void Filesystem::getDirectoryClusterNumber(string directory)
 	string recordName;
 	for(unsigned int i = 0; i < files.size(); i++)
 		{
+			// If direcory
 			if((int)files[i].attr == 16 )
 			{
 				// Reset recordName
@@ -358,6 +359,51 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector)
 /*
 	Checks if the directory exists in the current working directory
 */
+bool Filesystem::directoryExistsAndChangeTo(string directoryName){
+	bool dirFound = false;
+	/*
+		We must note that the directory name the user enters may just be RED 
+		(no spaces) but the stored value may contain spaces so we must know when
+		to ignore that.
+	*/
+	for(unsigned int i = 0; i < files.size(); i++)
+	{
+		string recordName;
+		
+		// Go through file name one character at a time
+		// and add its name to the recordName
+		for(int j = 0; j < 11; j++)
+		{
+			char readInChar = files[i].name[j];
+			recordName.push_back(readInChar);
+		}	
+
+		// cout << "Record Name: " << recordName << endl;
+		// cout << "Record Name: " << recordName.length() << endl;
+		
+		// //fprintf()
+		// cout << "Directory Name: " << directoryName << endl;
+		// cout << "Directory Name: " << directoryName.length() << endl;
+
+		// Trims and converts to uppercase the record and directoryname
+		recordName = normalizeToUppercase(recordName, ' ');
+		directoryName = normalizeToUppercase(directoryName, '.');
+		
+		// If director and recordname = directorName
+		if(recordName == directoryName && files[i].attr == 16 )
+		{
+			dirFound = true; // Directories found
+			findDirectoriesForCluster(files[i].fClusterLocation);
+			break;
+		}
+	
+	}
+	return dirFound;
+}
+
+/*
+	Checks if the directory exists in the current working directory
+*/
 bool Filesystem::directoryExists(string directoryName){
 	bool dirFound = false;
 	/*
@@ -388,6 +434,7 @@ bool Filesystem::directoryExists(string directoryName){
 		recordName = normalizeToUppercase(recordName, ' ');
 		directoryName = normalizeToUppercase(directoryName, '.');
 		
+		// If director and recordname = directorName
 		if(recordName == directoryName && files[i].attr == 16 )
 		{
 			dirFound = true; // Directories found
