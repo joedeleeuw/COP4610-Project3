@@ -15,6 +15,9 @@ I have tried a way around which is to take the index of the last value we
 cd'd into and then going up to find it's . and down but this will only
 fix non cd issues.
 
+We realized we probably shouldn't have stored everything in a vector, instead we should have jus read things
+on demand.
+
 https://www.pjrc.com/tech/8051/ide/fat32.html
 
 IMPORTANT - We need to read the file contents of the directory that is our active directory. So need to add some function for that

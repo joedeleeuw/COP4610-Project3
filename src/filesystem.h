@@ -69,6 +69,7 @@ public:
 	void findDirectoriesForCluster(int, int);
 	void getRootDirectoryContents(int);
 	bool getDirectoryClusterNumber(string);
+	void readFilesystemforFile(int,string);
 	void PrintCurrentDirectory(int directoryDataSector, bool store = false);
 	int findFirstSectorOfCluster(int clusterIndex);
 	string convertCharNameToString(unsigned int index, int numValuesToAddTogether);
@@ -115,6 +116,7 @@ public:
 	int RootClusterSector;
 	const char* fname; // file name
 	int image_fd;
+	string filetoRemove;
 	unsigned fileSize; // Stores file size
 	uint8_t *fdata;
 	string workingDirectory;
