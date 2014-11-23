@@ -60,7 +60,7 @@ public:
 	void removeDirectory(string);
 	void listDirectory(string); // ls command
 	void makeDirectory(string);
-	bool directoryExists(string);
+	int directoryExists(string, int type = 0);
 	bool directoryExistsAndChangeTo(string);
 	void entrySize(string);
 	void restoreFile();
@@ -72,6 +72,7 @@ public:
 	void PrintCurrentDirectory(int directoryDataSector, bool store = false);
 	int findFirstSectorOfCluster(int clusterIndex);
 	string convertCharNameToString(unsigned int index, int numValuesToAddTogether);
+	void readEntireFilesystem(int currentCluster);
 	
 	int binaryAdd(int, int);
 
