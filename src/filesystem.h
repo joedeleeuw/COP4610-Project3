@@ -66,11 +66,12 @@ public:
 	void restoreFile();
 	void findRootDirectory();
 	void getFileSize();
-	void findDirectoriesForCluster(int, bool);
+	void findDirectoriesForCluster(int, int);
 	void getRootDirectoryContents(int);
 	bool getDirectoryClusterNumber(string);
-	void PrintCurrentDirectory(int);
+	void PrintCurrentDirectory(int directoryDataSector, bool store = false);
 	int findFirstSectorOfCluster(int clusterIndex);
+	string convertCharNameToString(unsigned int index, int numValuesToAddTogether);
 	
 	int binaryAdd(int, int);
 
@@ -107,6 +108,7 @@ public:
 	
 	int FirstDataSector;
 	int bytesPerCluster;
+	unsigned int currentClusterLocation;
 	int firstSectorClusterRD;
 	int secondSectorClusterRD;
 	int RootClusterSector;
@@ -115,6 +117,8 @@ public:
 	unsigned fileSize; // Stores file size
 	uint8_t *fdata;
 	string workingDirectory;
+	unsigned int lastIFileLocation; // Contains the index value of the last file we read in
+									// so we can check if a file exists later on
 	
 	vector<fileRecord> files;
 	vector<fileRecord> currentDir;

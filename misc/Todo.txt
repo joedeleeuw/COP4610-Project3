@@ -3,7 +3,8 @@ TODO
 Known bugs
 
 Can cd or ls to a directory which is not the child of the current. See MiscNotes.txt
-. and .. not being parsed corectly may have to do with the ls and cd stuff
+. and .. not being parsed corectly may have to do with the ls and cd stuff. Partly
+implemented.
 
 Commands done 
 fsinfo 

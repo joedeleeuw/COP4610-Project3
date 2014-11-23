@@ -44,6 +44,15 @@ Filesystem::Filesystem(const char* name)
 	init();
 }
 
+/*
+	Finds the first sector based on the cluster we pass in
+*/
+int Filesystem::findFirstSectorOfCluster(int clusterIndex){
+	// Contains the local sector we're reading in NYI
+	return ((clusterIndex - 2) * BPB_SecPerClus) + FirstDataSector;
+}
+
+
 /* Called by constructor to set up required fields
    for Filesystem
 */
@@ -73,6 +82,7 @@ void Filesystem::init()
 
 	bytesPerCluster = BPB_BytsPerSec * BPB_SecPerClus;
 	
+	currentClusterLocation = 2;
 	// Now we read in the root directory
 	findRootDirectory();
 }
@@ -122,120 +132,6 @@ void Filesystem::findRootDirectory()
 	getRootDirectoryContents(secondSectorClusterRD);
 
 }
-
-/*
-	Finds the first sector based on the cluster we pass in
-*/
-int Filesystem::findFirstSectorOfCluster(int clusterIndex){
-	// Contains the local sector we're reading in NYI
-	return ((clusterIndex - 2) * BPB_SecPerClus) + FirstDataSector;
-}
-
-/*Pass this function a cluster number, it will find the first data sector for the cluster
-as well as check to see if there is another cluster associated with it in the FAT
-Call function to read from data sector in this function.
-*/
-
-void Filesystem::findDirectoriesForCluster(int clusterIndex, bool printOut = false)
-{
-	
-	int dataSector;
-	uint32_t nextCluster;
-	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
-	while(clusterIndex != 268435455)
-	{
-		
-		dataSector = findFirstSectorOfCluster(clusterIndex);
-		// Gets the FATEntry for the location of the next directory cluster
-		FATEntryRCluster = this->findFatEntry(clusterIndex);
-		//The second cluster number of the root directory. 
-		nextCluster = parseInteger<uint32_t>(fdata + FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum * BPB_BytsPerSec);
-		clusterIndex = nextCluster;
-		//this will be called for as many additional clusters there are for a directory.
-		if(printOut)
-			PrintCurrentDirectory(dataSector);
-	}	
-	
-	fprintf(stdout,"EOC Marker hit %x\n", clusterIndex);
-
-	
-}
-
-/*
-	Changes the directory and checks if it exists.
-	
-	TODO NYI - Need to check if directory would be transformed into version of what
-	we are comparing it against, SEE FAT documentation.
-*/
-void Filesystem::changeDirectory(string directoryName)
-{
-	// If the directory exists (pretty self explanatory)
-	if(directoryExistsAndChangeTo(directoryName))
-	{
-		cout << "Working directory changed to " << directoryName  << endl;
-		workingDirectory = directoryName;
-	}
-	else
-	{
-		cout << "Directory " << directoryName << " was not found" << endl;
-		return;
-	}
-	
-		//cout <<"Vector Size: " <<files.size() << endl;
-}
-
-/*
-	Lists directories out.
-*/
-void Filesystem::listDirectory(string dir_name)
-{
-	// If we didn't find the directory
-	if(!getDirectoryClusterNumber(dir_name)){
-		cout << "Directory " << dir_name << " not found." << endl;
-	}
-}
-
-/*
-	Prints out file system information
-*/
-void Filesystem::fsinfo()
-{
-	fprintf(stdout,"%u Root Cluster\n",BPB_RootClus);
-	fprintf(stdout,"%u Bytes per sector\n",BPB_BytsPerSec);
-	fprintf(stdout,"%u Sectors per cluster\n",BPB_SecPerClus);
-	fprintf(stdout,"%u Toal sectors\n",BPB_TotSec32);
-	fprintf(stdout, "%u Number of FATs\n", BPB_NuMFATs);
-	fprintf(stdout, "%u Sectors per FAT\n", BPB_FATz32);
-}
-
-void Filesystem::openFile(string file_name, string mode)
-{
-
-	fileTable[file_name] = mode;
-
-}
-
-int Filesystem::binaryAdd(int firstBinary, int secondBinary)
-{
-	int result = 0;
-	int i=0,remainder = 0,sum[20];
-	while(firstBinary!=0||secondBinary!=0)
-	{
-         sum[i++] =  (firstBinary %10 + secondBinary %10 + remainder ) % 2;
-         remainder = (firstBinary %10 + secondBinary %10 + remainder ) / 2;
-         firstBinary = firstBinary/10;
-         secondBinary = secondBinary/10;
-    }
-
-    if(remainder!=0)
-         sum[i++] = remainder;
-
-    --i;
-    while(i>=0)result += sum[i--];
-
-   return result;
-}
-
 
 void Filesystem::getRootDirectoryContents(int FirstDataSector)
 {
@@ -288,8 +184,41 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 			cout << endl;
 			record.currentFolder = workingDirectory;
 			files.push_back(record); 
+			
+			
 		}
 
+}
+
+
+/*Pass this function a cluster number, it will find the first data sector for the cluster
+as well as check to see if there is another cluster associated with it in the FAT
+Call function to read from data sector in this function.
+*/
+
+void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
+{
+	
+	int dataSector;
+	uint32_t nextCluster;
+	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
+	while(clusterIndex != 268435455)
+	{
+		
+		dataSector = findFirstSectorOfCluster(clusterIndex);
+		// Gets the FATEntry for the location of the next directory cluster
+		FATEntryRCluster = this->findFatEntry(clusterIndex);
+		//The second cluster number of the root directory. 
+		nextCluster = parseInteger<uint32_t>(fdata + FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum * BPB_BytsPerSec);
+		clusterIndex = nextCluster;
+		//this will be called for as many additional clusters there are for a directory.
+		if(toDo = 0;)
+		PrintCurrentDirectory(dataSector);
+	}	
+	
+	fprintf(stdout,"EOC Marker hit %x\n", clusterIndex);
+
+	
 }
 
 //this function gets the cluster number for a directory from the vector, and then calls the function to get the data sector and future clusters for the sectors.
@@ -318,7 +247,7 @@ bool Filesystem::getDirectoryClusterNumber(string directory)
 				
 				if(recordName == directory)
 				{
-					findDirectoriesForCluster(files[i].fClusterLocation, true);
+					findDirectoriesForCluster(files[i].fClusterLocation, 0);
 					foundRecord = true;
 					break;
 				}
@@ -329,7 +258,7 @@ bool Filesystem::getDirectoryClusterNumber(string directory)
 }
 /*This function takes in the data sector from a directory cluster as an argument, and then prints out the records in that cluster
 this funciton is called n amount of times, where n is the amount of clusters associated with a directory.*/
-void Filesystem::PrintCurrentDirectory(int directoryDataSector)
+void Filesystem::PrintCurrentDirectory(int directoryDataSector, bool store)
 {
 	fileRecord dirRecord;
 	for(int i = 0; i < BPB_BytsPerSec/32; i++)
@@ -359,6 +288,7 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector)
 			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
 			dirRecord.highCluster <<= 16;
 			dirRecord.fClusterLocation = dirRecord.highCluster | dirRecord.lowCluster;
+			if(store == true)
 			files.push_back(dirRecord);
 			
 			cout << endl;
@@ -377,17 +307,17 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 	*/
 	for(unsigned int i = 0; i < files.size(); i++)
 	{
-		string recordName;
+		string recordName = convertCharNameToString(i, 11);
 		
 		// Go through file name one character at a time
 		// and add its name to the recordName
-		for(int j = 0; j < 11; j++)
-		{
-			char readInChar = files[i].name[j];
-			recordName.push_back(readInChar);
-		}	
+		// for(int j = 0; j < 11; j++)
+		// {
+		// 	char readInChar = files[i].name[j];
+		// 	recordName.push_back(readInChar);
+		// }	
 
-		// cout << "Record Name: " << recordName << endl;
+		cout << "Record Name: " << recordName << endl;
 		// cout << "Record Name: " << recordName.length() << endl;
 		
 		// //fprintf()
@@ -398,55 +328,29 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 		recordName = normalizeToUppercase(recordName, ' ');
 		directoryName = normalizeToUppercase(directoryName, '.');
 		
-		// If director and recordname = directorName
-		if(recordName == directoryName && files[i].attr == 16 )
+		// If directory and recordname = directorName
+		if(recordName == directoryName && files[i].attr == 16)
 		{
+			currentClusterLocation = files[i].fClusterLocation;
+			// Now we check if the directorys .. is the same as the current
+			// directory we are in only do if not in home directory
+			int x = i;
+			while(1 && x != 0){
+				x--;
+				string fileName = convertCharNameToString(x, 11);
+				cout << fileName << endl;
+				if(fileName == ".."){
+					// If the directory we want to change into has the parent directory
+					// as the curren directory were in then were good oherwise were not
+					if(files[x].fClusterLocation != currentClusterLocation){
+						return false;
+					}
+					break;
+				}
+			}
+			
 			dirFound = true; // Directories found
 			findDirectoriesForCluster(files[i].fClusterLocation, false);
-			break;
-		}
-	
-	}
-	return dirFound;
-}
-
-/*
-	Checks if the directory exists in the current working directory
-*/
-bool Filesystem::directoryExists(string directoryName){
-	bool dirFound = false;
-	/*
-		We must note that the directory name the user enters may just be RED 
-		(no spaces) but the stored value may contain spaces so we must know when
-		to ignore that.
-	*/
-	for(unsigned int i = 0; i < files.size(); i++)
-	{
-		string recordName;
-		
-		// Go through file name one character at a time
-		// and add its name to the recordName
-		for(int j = 0; j < 11; j++)
-		{
-			char readInChar = files[i].name[j];
-			recordName.push_back(readInChar);
-		}	
-
-		// cout << "Record Name: " << recordName << endl;
-		// cout << "Record Name: " << recordName.length() << endl;
-		
-		// //fprintf()
-		// cout << "Directory Name: " << directoryName << endl;
-		// cout << "Directory Name: " << directoryName.length() << endl;
-
-		// Trims and converts to uppercase the record and directoryname
-		recordName = normalizeToUppercase(recordName, ' ');
-		directoryName = normalizeToUppercase(directoryName, '.');
-		
-		// If director and recordname = directorName
-		if(recordName == directoryName && files[i].attr == 16 )
-		{
-			dirFound = true; // Directories found
 			break;
 		}
 	
@@ -488,4 +392,186 @@ void Filesystem::removeDirectory(string directoryName){
     else{
     	
     }
+}
+
+/*
+	Changes the directory and checks if it exists.
+	
+	TODO NYI - Need to check if directory would be transformed into version of what
+	we are comparing it against, SEE FAT documentation.
+*/
+void Filesystem::changeDirectory(string directoryName)
+{
+	// If the directory exists (pretty self explanatory)
+	if(directoryExistsAndChangeTo(directoryName))
+	{
+		cout << "Working directory changed to " << directoryName  << endl;
+		workingDirectory = directoryName;
+	}
+	else
+	{
+		cout << "Directory " << directoryName << " was not found" << endl;
+		return;
+	}
+	
+		//cout <<"Vector Size: " <<files.size() << endl;
+}
+
+/*
+	Checks if the directory exists in the current working directory
+*/
+bool Filesystem::directoryExists(string directoryName){
+	bool dirFound = false;
+	
+	// Go upwards till we find a ..
+	for(unsigned v = lastIFileLocation; convertCharNameToString(v, 11) != ".."  && v != 0; v --){
+		
+	}
+	
+	/*
+		We must note that the directory name the user enters may just be RED 
+		(no spaces) but the stored value may contain spaces so we must know when
+		to ignore that.
+	*/
+	for(unsigned int i = 0; i < files.size(); i++)
+	{
+		/*
+			To check if a diretory exists we are checking our current working
+			folder. The way we do that is go through all our files till we find
+			the occurence of it. The one issue we have we this is it will only
+			find the first occurence so if multiple folders exist with the same
+			name things are going to be a bit haywire.
+			
+			I have tried a way around which is to take the index of the last value we 
+			cd'd into and then going up to find it's . and down but this will only
+			fix non cd issues.
+		*/
+		
+		// Go through file name one character at a time
+		// and add its name to the recordName
+		string recordName = convertCharNameToString(i, 11);
+		
+
+		// cout << "Record Name: " << recordName << endl;
+		// cout << "Record Name: " << recordName.length() << endl;
+		
+		// //fprintf()
+		// cout << "Directory Name: " << directoryName << endl;
+		// cout << "Directory Name: " << directoryName.length() << endl;
+
+		// Trims and converts to uppercase the record and directoryname
+		recordName = normalizeToUppercase(recordName, ' ');
+		directoryName = normalizeToUppercase(directoryName, '.');
+		
+		// If director and recordname = directorName
+		if(recordName == directoryName && files[i].attr == 16 )
+		{
+			dirFound = true; // Directories found
+			break;
+		}
+	
+	}
+	return dirFound;
+}
+
+/*
+	Takes the index to read from and the number of values and returns it 
+	as a string
+*/
+string Filesystem::convertCharNameToString(unsigned int index, int numValuesToAddTogether = 11){
+	string recordName = "";
+	for(int j = 0; j < 11; j++)
+	{
+		char readInChar = files[index].name[j];
+		recordName.push_back(readInChar);
+	}	
+	return recordName;
+}
+
+/*
+	Lists directories out.
+*/
+void Filesystem::listDirectory(string dir_name)
+{
+	// If we didn't find the directory
+	if(!getDirectoryClusterNumber(dir_name)){
+		cout << "Directory " << dir_name << " not found." << endl;
+	}
+}
+
+/*
+	Prints out file system information
+*/
+void Filesystem::fsinfo()
+{
+	fprintf(stdout,"%u Root Cluster\n",BPB_RootClus);
+	fprintf(stdout,"%u Bytes per sector\n",BPB_BytsPerSec);
+	fprintf(stdout,"%u Sectors per cluster\n",BPB_SecPerClus);
+	fprintf(stdout,"%u Toal sectors\n",BPB_TotSec32);
+	fprintf(stdout, "%u Number of FATs\n", BPB_NuMFATs);
+	fprintf(stdout, "%u Sectors per FAT\n", BPB_FATz32);
+}
+
+void Filesystem::openFile(string file_name, string mode)
+{
+
+	fileTable[file_name] = mode;
+
+}
+
+
+
+void Filesystem::removeFile(string filetoRemove)
+{
+	
+	
+	for(unsigned int i=0; i < files.size(); i++)
+	{
+		string fileName = convertCharNameToString(i, 11);
+		if(fileName == filetoRemove)
+		{	
+			files[i].name[0] = 225;
+			
+		}
+	}
+	
+}
+
+bool Filesystem::findName(int directoryDataSector)
+{
+	bool deletedFoundName = false;
+	for(int i = 0; i < BPB_BytsPerSec/32; i++)
+		{
+		
+		// If it's a long file name, skip over the record.
+			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
+			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 16)continue;	
+			//if the record is empty, then break, because we have reached the end of the sector, or cluster? does it really matter?
+			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0) == 0)break;	
+			if
+			for (int j = 0; j < 11; j++)
+			{
+				//fprintf(stderr,"inner counter index: %d\n", j);
+				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
+				dirRecord.name[j] = (char)parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + j);
+				fprintf(stdout,"%c", dirRecord.name[j]);
+				
+			}
+			cout << " ";
+			//fprintf(stderr,"outer counter index: %d\n", i);
+			if ((int)dirRecord.name[1] < 10 )continue;
+			
+			//refer to the filesystem spec instead of the dumb slides, the offsets were wrong, and were ORing time stamps.
+			dirRecord.attr = parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11);
+			dirRecord.highCluster = parseInteger<uint16_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 20);
+			dirRecord.lowCluster = parseInteger<uint16_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 26);
+		 
+			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
+			dirRecord.highCluster <<= 16;
+			dirRecord.fClusterLocation = dirRecord.highCluster | dirRecord.lowCluster;
+	
+	}
+	
+
+	return deletedFoundName;
 }
