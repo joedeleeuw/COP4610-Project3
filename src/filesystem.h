@@ -74,7 +74,7 @@ public:
 	int findFirstSectorOfCluster(int clusterIndex);
 	string convertCharNameToString(unsigned int index, int numValuesToAddTogether);
 	void readEntireFilesystem(int currentCluster);
-	
+	void openImage();
 	int binaryAdd(int, int);
 
 
@@ -121,7 +121,7 @@ public:
 	uint8_t *fdata;
 	string workingDirectory;
 	unsigned int lastIFileLocation; // Contains the index value of the last file we read in
-									// so we can check if a file exists later on
+	FILE * imageFile;								// so we can check if a file exists later on
 	
 	vector<fileRecord> files;
 	vector<fileRecord> currentDir;

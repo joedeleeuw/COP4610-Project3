@@ -86,6 +86,7 @@ void Filesystem::init()
 	currentClusterLocation = 2;
 	// Now we read in the root directory
 	findRootDirectory();
+	//openImage();
 }
 
 /*
@@ -213,10 +214,12 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 		nextCluster = parseInteger<uint32_t>(fdata + FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum * BPB_BytsPerSec);
 		clusterIndex = nextCluster;
 		//this will be called for as many additional clusters there are for a directory.
-		if(toDo ==0)
+		if(toDo == 0)
 		PrintCurrentDirectory(dataSector);
 		if(toDo == 1)
 		readFilesystemforFile(dataSector,filetoRemove);
+		if(toDo == 2)
+		PrintCurrentDirectory(dataSector, true);
 		
 	}	
 	
@@ -335,7 +338,7 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 		// If directory and recordname = directorName
 		if(recordName == directoryName && files[i].attr == 16)
 		{
-			currentClusterLocation = files[i].fClusterLocation;
+			//currentClusterLocation = files[i].fClusterLocation;
 			// Now we check if the directorys .. is the same as the current
 			// directory we are in only do if not in home directory
 			// int x = i;
@@ -355,7 +358,7 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 			lastIFileLocation = 1;
 			
 			dirFound = true; // Directories found
-			findDirectoriesForCluster(files[i].fClusterLocation, 0);
+			findDirectoriesForCluster(files[i].fClusterLocation, 2);
 			break;
 		}
 	
@@ -433,19 +436,19 @@ int Filesystem::directoryExists(string directoryName, int type){
 	// Will return the position of the . found in the files array if the file
 	// or directory looking for isn't found will return -1
 	
-	unsigned int v;
-	cout << "last IFile " << lastIFileLocation << endl;
-	// Go upwards till we find a ..
-	for(v = lastIFileLocation; convertCharNameToString(v, 11) != ".."  && v != 0; v--){
-		cout << convertCharNameToString(v, 11) << endl;
-	}
-	cout << "v is " << v << endl;
+	// unsigned int v;
+	// cout << "last IFile " << lastIFileLocation << endl;
+	// // Go upwards till we find a ..
+	// for(v = lastIFileLocation; convertCharNameToString(v, 11) != ".."  && v != 0; v--){
+	// 	cout << convertCharNameToString(v, 11) << endl;
+	// }
+	// cout << "v is " << v << endl;
 	/*
 		We must note that the directory name the user enters may just be RED 
 		(no spaces) but the stored value may contain spaces so we must know when
 		to ignore that.
 	*/
-	for(unsigned int i = v; i < files.size(); i++)
+	for(unsigned int i = 0; i < files.size(); i++)
 	{
 		/*
 			To check if a diretory exists we are checking our current working
@@ -556,20 +559,24 @@ void Filesystem::openFile(string file_name, string mode)
 void Filesystem::removeFile(string file)
 {
 	filetoRemove = file;
-	int dotClusterIndex = directoryExists(filetoRemove);
+	int dotClusterIndex = directoryExists(filetoRemove,1);
+	 int dotCluster = files[dotClusterIndex].fClusterLocation;
 	 if(dotClusterIndex != -1)
 	 {
-   		for(unsigned int i = 0; i < files.size(); i++)
+   		for(int i = 0; 0 < files.size(); i++)
    		{
-   			
+   			string compare = "";
+   			compare = convertCharNameToString(i);
+   			if (compare == file && files[i].currentFolder == workingDirectory)
+   				files[i].name[0] = 229;
    		}
    		cout << "The file " << filetoRemove << "  exists in the current directory." << endl;
-     	findDirectoriesForCluster(fileFound,1);
+     	findDirectoriesForCluster(dotCluster,1);
 	 }
-    // Otherwise we create the directory
+    // Otherwise we didnt find the directory
     else
     {
-    	
+    	cout << "File " << file << " not found" << endl;
     }
 	
 }
@@ -578,9 +585,11 @@ void Filesystem::removeFile(string file)
 void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemove)
 {
 	fileRecord dirRecord;
+	
+	
 	for(int i = 0; i < BPB_BytsPerSec/32; i++)
 		{
-		
+			string recordName = "";
 		// If it's a long file name, skip over the record.
 			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
 			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 16)continue;	
@@ -600,9 +609,11 @@ void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemo
 				char readInChar = dirRecord.name[j];
 				recordName.push_back(readInChar);
 			}
+			// Set the file to deleted in the filesystem
 			if(filetoRemove == recordName)
 			{
-				(int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0) = 255
+				
+			
 			}
 			//fprintf(stderr,"outer counter index: %d\n", i);
 			if ((int)dirRecord.name[1] < 10 )continue;
@@ -618,4 +629,20 @@ void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemo
 			
 		}
 }
+
+
+void Filesystem::openImage()
+{
+	
+  imageFile = fopen (fname,"wb");
+  // If file not found
+  if (imageFile==NULL){
+  	perror ("Error opening file");
+  }
+ 
+}
+
+
+	
+
 
