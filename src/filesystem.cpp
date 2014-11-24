@@ -1,6 +1,7 @@
 #include "filesystem.h"
 #include "directory.h"
 #include <vector>
+#include <sstream>
 
 // FATENTRY
 /*
@@ -295,8 +296,10 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector, bool store)
 			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
 			dirRecord.highCluster <<= 16;
 			dirRecord.fClusterLocation = dirRecord.highCluster | dirRecord.lowCluster;
+			dirRecord.currentFolder = workingDirectory;
 			if(store == true)
 			files.push_back(dirRecord);
+
 			
 			cout << endl;
 	}
@@ -312,8 +315,10 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 		(no spaces) but the stored value may contain spaces so we must know when
 		to ignore that.
 	*/
+
 	for(unsigned int i = 0; i < files.size(); i++)
 	{
+		int x = i;
 		string recordName = convertCharNameToString(i, 11);
 		
 		// Go through file name one character at a time
@@ -323,8 +328,9 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 		// 	char readInChar = files[i].name[j];
 		// 	recordName.push_back(readInChar);
 		// }	
-
-		cout << "Record Name: " << recordName << endl;
+		
+		cout << "Record Name: " << recordName << "   " << "cluster number: " << files[i].fClusterLocation << endl;
+		
 		// cout << "Record Name: " << recordName.length() << endl;
 		
 		// //fprintf()
@@ -333,11 +339,63 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 
 		// Trims and converts to uppercase the record and directoryname
 		recordName = normalizeToUppercase(recordName, ' ');
-		directoryName = normalizeToUppercase(directoryName, '.');
+		//directoryName = normalizeToUppercase(directoryName,' ');
+		//cant do this
+		//directoryName = normalizeToUppercase(directoryName, '.');
 		
 		// If directory and recordname = directorName
-		if(recordName == directoryName && files[i].attr == 16)
+		
+		
+		while(recordName == directoryName && (int)files[i].attr == 16 && x!=0)
 		{
+			cout <<"currentClusterLocation" <<currentClusterLocation << endl;
+			if(directoryName == ".")
+			{
+				currentClusterLocation = files[i].fClusterLocation;
+				return true;
+			}
+			if(directoryName == "..")
+			{
+				if(files[i].fClusterLocation == 0)
+					{
+						currentClusterLocation = 2;
+						workingDirectory = "root";
+						return true;
+					}
+					if(files[i].fClusterLocation == currentClusterLocation)
+					{
+						currentClusterLocation = files[i].fClusterLocation;
+						//findDirectoriesForCluster(files[i].fClusterLocation,2);
+						return true;
+					}
+				
+				}
+		
+			x--;
+			string filename = convertCharNameToString(x,11);
+			filename = normalizeToUppercase(filename, ' ');
+			//First time this block of code runs, currentClusterLocaiton is the root cluster;
+			if(filename == "..")
+			{
+				if(files[x].fClusterLocation == currentClusterLocation || files[x].fClusterLocation == 0)
+				{
+					
+					currentClusterLocation = files[i].fClusterLocation;
+					findDirectoriesForCluster(files[i].fClusterLocation,2);
+					return true;
+				}
+			}
+			
+			if(currentClusterLocation == 2 )
+			{
+				currentClusterLocation = files[i].fClusterLocation;
+				findDirectoriesForCluster(files[i].fClusterLocation,2);
+				return true;
+			}
+
+		}
+
+
 			//currentClusterLocation = files[i].fClusterLocation;
 			// Now we check if the directorys .. is the same as the current
 			// directory we are in only do if not in home directory
@@ -355,7 +413,7 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 			// 		break;
 			// 	}
 			// }
-			lastIFileLocation = 1;
+			/*lastIFileLocation = 1;
 			
 			dirFound = true; // Directories found
 			findDirectoriesForCluster(files[i].fClusterLocation, 2);
@@ -364,6 +422,12 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 	
 	}
 	return dirFound;
+}*/
+
+		
+		
+	}
+return false;
 }
 
 /*
@@ -411,13 +475,16 @@ void Filesystem::removeDirectory(string directoryName){
 void Filesystem::changeDirectory(string directoryName)
 {
 	// If the directory exists (pretty self explanatory)
+	previousWorkingDirectory = workingDirectory;
+	workingDirectory = directoryName;
 	if(directoryExistsAndChangeTo(directoryName))
 	{
 		cout << "Working directory changed to " << directoryName  << endl;
-		workingDirectory = directoryName;
+		
 	}
 	else
 	{
+		workingDirectory = previousWorkingDirectory;
 		cout << "Directory " << directoryName << " was not found" << endl;
 		return;
 	}
@@ -466,10 +533,12 @@ int Filesystem::directoryExists(string directoryName, int type){
 		string recordName = convertCharNameToString(i, 11);
 		
 		// Once we find a . we're done itterating through the folder
+		/* whaaaaaaat
 		if(recordName == "."){
 			dirPos = -1;
 			break;
 		}
+		*/
 
 		// cout << "Record Name: " << recordName << endl;
 		// cout << "Record Name: " << recordName.length() << endl;
@@ -497,9 +566,10 @@ int Filesystem::directoryExists(string directoryName, int type){
 			break;
 		}
 		
-		// If director and recordname = directorName
+		// If directory and recordname = directorName
 		if(recordName == directoryName && (int)files[i].attr == propertyType)
 		{
+			
 			// FIX ME
 			dirPos = 1; // Directories found
 			break;
@@ -560,7 +630,7 @@ void Filesystem::removeFile(string file)
 {
 	filetoRemove = file;
 	int dotClusterIndex = directoryExists(filetoRemove,1);
-	 int dotCluster = files[dotClusterIndex].fClusterLocation;
+	int dotCluster = files[dotClusterIndex].fClusterLocation;
 	 if(dotClusterIndex != -1)
 	 {
    		for(int i = 0; 0 < files.size(); i++)
@@ -640,6 +710,19 @@ void Filesystem::openImage()
   	perror ("Error opening file");
   }
  
+}
+
+void Filesystem::displayVectorContents()
+{
+
+	for(unsigned int i =0; i < files.size(); i++)
+	{
+		for(int j = 0; j < 11; j++)
+		{
+			cout << files[i].name[j];
+		}
+		cout << endl;
+	}
 }
 
 

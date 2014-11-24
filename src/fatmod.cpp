@@ -161,6 +161,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 			fs->removeDirectory(userArgs[1]);
 		}
 	}
+
 	else if (userArgs[0].compare("size") == 0)
 	{
 		if (userArgs[1] == ""){
@@ -182,6 +183,12 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
         type_of_command = 'x';
     }
     // Testing purposes
+    
+    else if(userArgs[0].compare("show") == 0)
+    {
+    	fs->displayVectorContents();
+    }
+
     else{
     	fs->findRootDirectory();
     }

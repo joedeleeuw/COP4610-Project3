@@ -76,6 +76,7 @@ public:
 	void readEntireFilesystem(int currentCluster);
 	void openImage();
 	int binaryAdd(int, int);
+	void displayVectorContents();
 
 
 
@@ -120,6 +121,7 @@ public:
 	unsigned fileSize; // Stores file size
 	uint8_t *fdata;
 	string workingDirectory;
+	string previousWorkingDirectory;
 	unsigned int lastIFileLocation; // Contains the index value of the last file we read in
 	FILE * imageFile;								// so we can check if a file exists later on
 	
