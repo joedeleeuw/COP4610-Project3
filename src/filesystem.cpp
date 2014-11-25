@@ -209,7 +209,7 @@ Call function to read from data sector in this function.
 void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 {
 	//EOC chain is 268435455
-	int dataSector;
+	dataSector = 0;
 	uint32_t nextCluster;
 	while(clusterIndex  != 268435455)
 	{
@@ -229,7 +229,7 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 			readFilesystemforFile(dataSector,filetoRemove);
 		}else if(toDo == 2){
 			PrintCurrentDirectory(dataSector, true);
-		}		
+		}
 	}	
 	
 	fprintf(stdout,"EOC Marker hit %x\n", clusterIndex);
@@ -367,7 +367,7 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 		// 	recordName.push_back(readInChar);
 		// }	
 		
-		cout << "Record Name: " << recordName << "   " << "cluster number: " << files[i].fClusterLocation << endl;
+	//	cout << "Record Name: " << recordName << "   " << "cluster number: " << files[i].fClusterLocation << endl;
 		
 		// cout << "Record Name: " << recordName.length() << endl;
 		
@@ -724,11 +724,13 @@ void Filesystem::removeDirectory(string directoryName){
 	int fileIndex = directoryExists(directoryName, 0);
 	
 	// Check to see if the directory contains any subfolders
-	// bool dirEmpty = 
+	getDirectoryClusterNumber(directoryName);
 	
+	if(verifyEmptyDirectory(dataSector)){
+		cout << "Directory " << directoryName << " is not empty" << endl;
 	//int dotCluster = files[dotClusterIndex].fClusterLocation;
 	// If directory found
-	 if(fileIndex != -1)
+	 }else if(fileIndex != -1)
 	 {
 	 		cout << fileIndex << " file index" << endl;
 	 		
@@ -877,38 +879,43 @@ void Filesystem::Read(string file_name,int start_pos,int num_bytes)
 */
 bool Filesystem::verifyEmptyDirectory(int directoryDataSector)
 {
-	// 	int recordsFound = 4;
-	// 	for(int i = 0; i < BPB_BytsPerSec/32; i++)
-	// 	{
+		fileRecord dirRecord;
+		int recordsFound = 2;
+		for(int i = 0; i < BPB_BytsPerSec/32; i++)
+		{
 			
-	// 		string recordName = "";
-	// 	// If it's a long file name, skip over the record.
-	// 		if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
-	// 		//if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 16)continue;	
-	// 		//if the record is empty, then break, because we have reached the end of the sector, or cluster? does it really matter?
-	// 		if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0) == 0) return (recordsFound == 0 ? true : false);	
+			string recordName = "";
+		// If it's a long file name, skip over the record.
+			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
+			//if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 16)continue;	
+			cout << "hit 1 - recordsFound " << recordsFound << endl;
+			//if the record is empty, then break, because we have reached the end of the sector, or cluster? does it really matter?
+			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0) == 0) return (recordsFound == 0) ? false : true;	
 			
-	// 		for (int j = 0; j < 11; j++)
-	// 		{
-	// 			//fprintf(stderr,"inner counter index: %d\n", j);
-	// 			//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
-	// 			dirRecord.name[j] = (char)parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + j);
-	// 			fprintf(stdout,"%c", dirRecord.name[j]);
+			for (int j = 0; j < 11; j++)
+			{
+				//fprintf(stderr,"inner counter index: %d\n", j);
+				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
+				dirRecord.name[j] = (char)parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + j);
+				fprintf(stdout,"%c", dirRecord.name[j]);
 				
-	// 		}
-	// 		for(int j = 0; j < 11; j++)
-	// 		{
-	// 			char readInChar = dirRecord.name[j];
-	// 			recordName.push_back(readInChar);
-	// 		}	
-	// 		recordName.erase(remove(recordName.begin(), recordName.end(), ''), recordName.end()); 
-	// 	// If we contain a . or .. then decrement counter
-	// 	if(recordName = "." || recordName = ".."){
-	// 		recordsFound--;
-	// 	}
+			}
+			for(int j = 0; j < 11; j++)
+			{
+				char readInChar = dirRecord.name[j];
+				recordName.push_back(readInChar);
+			}	
+			recordName.erase(remove(recordName.begin(), recordName.end(), ' '), recordName.end()); 
+		// If we contain a . or .. then decrement counter
+		if(recordName == "." || recordName == ".."){
+			recordsFound--;
+		}
+		// If not an empty directory
+		else if((int)recordName[0] != -27){
+			recordsFound++;
+		}
 	
-	// }
+	}
 	
-	// return (recordsFound == 0 ? true : false);
-	return true;
+	return (recordsFound == 0) ? false : true;	
 }

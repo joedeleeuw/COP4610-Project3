@@ -128,7 +128,7 @@ public:
 	string previousWorkingDirectory;
 	unsigned int lastIFileLocation; // Contains the index value of the last file we read in
 	FILE * imageFile;								// so we can check if a file exists later on
-	
+	int dataSector;
 	//index for current file found in directoryExists
 	int currentFileIndex;
 	vector<fileRecord> files;

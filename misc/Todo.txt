@@ -18,6 +18,7 @@ cd
 rm
 open
 close
+rmdir
 
 Fixed
 
