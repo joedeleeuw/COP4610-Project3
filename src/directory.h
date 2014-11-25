@@ -18,6 +18,8 @@ uint16_t highCluster;
 uint16_t lowCluster;
 uint32_t fileSize;
 uint32_t fClusterLocation;
+uint16_t LstACC;
+int unique;
 };
 
 class Directory{

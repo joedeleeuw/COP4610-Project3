@@ -19,6 +19,7 @@
 #include <fstream>
 #include <sys/mman.h>
 #include <algorithm> // For transform
+#include <map>
 
 // Custom classes
 #include "file.h"
@@ -109,6 +110,9 @@ public:
 	File fileHandler;
 	//combination of high and low cluster for an individual record.
 	
+	// Maps what we've read in
+	map<int, int> valuesStoredMap;
+	
 	int FirstDataSector;
 	int bytesPerCluster;
 	unsigned int currentClusterLocation;
@@ -124,11 +128,12 @@ public:
 	string previousWorkingDirectory;
 	unsigned int lastIFileLocation; // Contains the index value of the last file we read in
 	FILE * imageFile;								// so we can check if a file exists later on
+	
 	//index for current file found in directoryExists
 	int currentFileIndex;
 	vector<fileRecord> files;
 	vector<fileRecord> currentDir;
-	unordered_map< string, string> fileTable;
+	map<int, int> fileTable;
 };
 
 #endif
