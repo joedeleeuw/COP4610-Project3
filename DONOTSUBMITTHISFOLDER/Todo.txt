@@ -11,6 +11,12 @@ before removing directory. Also printing out directories in root directory.
 
 ls .. doesn't work it causes a crash
 
+MUST BE DONE
+Readme
+Finish Report
+remove couts that should be marked as debug or add if(DEBUG) to only print out
+Submit file (src and Documentation folder)
+
 Commands done 
 fsinfo 
 ls
@@ -19,6 +25,7 @@ rm
 open
 close
 rmdir
+read
 
 Fixed
 

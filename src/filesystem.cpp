@@ -889,7 +889,10 @@ void Filesystem::Read(string file_name,int start_pos,int num_bytes)
 	cout << "test" << endl;
 	findDirectoriesForCluster(files[currentFileIndex].fClusterLocation,3);
 	
-	
+	if(files[currentFileIndex].fileSize < start_pos)
+	{
+		cout << "start position is greater than file size" << endl;
+	}
 	for(int j = 0; j < num_bytes; j++)
 	{
 		
