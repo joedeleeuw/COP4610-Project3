@@ -108,8 +108,10 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	{
 		if (userArgs[3] == ""){
 			printf("%s\n", "wrong amount of arguments supplied");
-		}else{
-			
+		}
+		else
+		{
+			fs->Read(userArgs[1],atoi(userArgs[2].c_str()),atoi(userArgs[3].c_str()));	
 		}
 		
 	}

@@ -1,6 +1,9 @@
 #ifndef FILESYSTEM_H
 #define FILESYSTEM_H
 
+// Debugging flag
+const bool DEBUG = true;
+
 /*
 	Contains code for calling out commands from the userspace (ls etc.)
 */

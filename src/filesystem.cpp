@@ -140,7 +140,8 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 	fileRecord record;
 	
 	record.currentFolder = "root";
-	cout << "cluster sector"<<FirstDataSector << endl;
+	if(DEBUG)
+		cout << "cluster sector"<<FirstDataSector << endl;
 	//number of records, had to divide by 32, because we were reading too far.
 	for(int i = 0; i < BPB_BytsPerSec/32; i++)
 		{
@@ -188,10 +189,11 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 			// Reads the file data
 			//fileHandler.getFileData(sectorToPass, fdata);
 			
-			fprintf(stdout,"Entry Type: %x ", record.attr);
-			fprintf(stdout,"next cluster location: %d", record.fClusterLocation);
-			
-			cout << endl;
+			if(DEBUG){
+				fprintf(stdout,"Entry Type: %x ", record.attr);
+				fprintf(stdout,"next cluster location: %d", record.fClusterLocation);
+				cout << endl;
+			}
 			record.currentFolder = workingDirectory;
 			files.push_back(record); 
 			
@@ -213,6 +215,7 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 	uint32_t nextCluster;
 	while(clusterIndex  != 268435455)
 	{
+		
 		FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
 
 		dataSector = findFirstSectorOfCluster(clusterIndex);
@@ -661,10 +664,15 @@ void Filesystem::openFile(string file_name, string mode)
 		fileTable[files[currentFileIndex].unique] = permType;
 		cout << file_name << " Has been opened with" << " mode " << mode << endl;
 	}
-	else
-	cout << "file is already open" << endl;
+	else{
+		cout << "file is already open" << endl;
+	}
+		
 }
 
+/*
+	Closes the passed in file
+*/
 void Filesystem::closeFile(string file_name)
 {
 	// converts passed in file name
@@ -682,6 +690,10 @@ void Filesystem::closeFile(string file_name)
 	}
 }
 
+/*
+	Checks if the file passed in is in the current directory and 
+	removes it if so
+*/
 void Filesystem::removeFile(string file)
 {
 	// Converts file
@@ -789,7 +801,8 @@ void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemo
 			// Set the file to deleted in the filesystem
 			if(filetoRemove == recordName)
 			{
-				cout << "setting byte" << endl;	
+				if(DEBUG)
+					cout << "setting byte" << endl;	
 				uint8_t bytes[] = {0xE5};
 				//cout << bytes[0] << endl;
 				long offset = (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0;
@@ -863,15 +876,30 @@ void Filesystem::entrySize(string entry_name)
 
 void Filesystem::Read(string file_name,int start_pos,int num_bytes)
 {
-	// openImage();
-	// for(int i = 0; i < num_bytes; i++)
-	// long offset = (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0;
-	// fseek(imageFile,offset,SEEK_SET);
-	// fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
-
+	file_name = normalizeToUppercase(file_name, '.'); 
 	
+	openImage();
+	char buffer[num_bytes];
+	if(directoryExists(file_name,1) < 0)
+	{
+		cout << "file" << file_name << " is not a file" << endl;
+		return;
+		
+	}
+	cout << "test" << endl;
+	findDirectoriesForCluster(files[currentFileIndex].fClusterLocation,3);
+	
+	
+	for(int j = 0; j < num_bytes; j++)
+	{
+		
+		long offset = (dataSector * BPB_BytsPerSec) + start_pos  + j;
+		fseek(imageFile,offset,SEEK_SET);
+		fread(buffer,sizeof(char),sizeof(buffer),imageFile);
+		fprintf(stdout,"%c",(char)buffer[j]);	
+	}
+	closeImage();
 }
-
 /*
 	Checks if the directory is empty in currentFileIndex
 	by finding the first . and .. and then seeing if their is anything
@@ -888,7 +916,8 @@ bool Filesystem::verifyEmptyDirectory(int directoryDataSector)
 		// If it's a long file name, skip over the record.
 			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
 			//if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 16)continue;	
-			cout << "hit 1 - recordsFound " << recordsFound << endl;
+			if(DEBUG)
+				cout << "hit 1 - recordsFound " << recordsFound << endl;
 			//if the record is empty, then break, because we have reached the end of the sector, or cluster? does it really matter?
 			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0) == 0) return (recordsFound == 0) ? false : true;	
 			
@@ -897,8 +926,6 @@ bool Filesystem::verifyEmptyDirectory(int directoryDataSector)
 				//fprintf(stderr,"inner counter index: %d\n", j);
 				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
 				dirRecord.name[j] = (char)parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + j);
-				fprintf(stdout,"%c", dirRecord.name[j]);
-				
 			}
 			for(int j = 0; j < 11; j++)
 			{
