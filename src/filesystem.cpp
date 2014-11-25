@@ -112,27 +112,24 @@ void Filesystem::getFileSize(){
 
 void Filesystem::findRootDirectory()
 {
-	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
-	firstSectorClusterRD = findFirstSectorOfCluster(BPB_RootClus);
-	//fprintf(stdout,"First Sector of First RD cluster %u ",firstSectorClusterRD);
-	
-	// Gets the FATEntry for the location of the next Root Directory Cluster
-	FATEntryRCluster = this->findFatEntry(2);
+  int dataSector;
+  uint32_t nextCluster;
+  nextCluster = BPB_RootClus;
+  FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
+  while(nextCluster != 268435448)
+  {
+    
+   dataSector = findFirstSectorOfCluster(nextCluster);
+  //fprintf(stdout,"First Sector of First RD cluster %u ",firstSectorClusterRD);
+  
+  // Gets the FATEntry for the location of the next Root Directory Cluster
+  FATEntryRCluster = this->findFatEntry(nextCluster);
 
-	//The second cluster number of the root directory. 
-	uint32_t secondRootCluster = parseInteger<uint32_t>(fdata + FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum * BPB_BytsPerSec);
-	//fprintf(stdout,"Next RD cluster value %x\n", secondRootCluster);
-	
+  //The second cluster number of the root directory. 
+  nextCluster = parseInteger<uint32_t>(fdata + FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum * BPB_BytsPerSec);
+  getRootDirectoryContents(dataSector);
 
-	//First sector of the second cluster of the root directory.
-	secondSectorClusterRD = findFirstSectorOfCluster(secondRootCluster);
-	// Gets the FATEntry for the location of the next Root Directory Cluster(EOC)
-	//FatEntry temp = this->findFatEntry(secondRootCluster);
-
-	//uint32_t EoC = parseInteger<uint32_t>(fdata + temp.FATOffset + temp.FATsecNum * BPB_BytsPerSec);
-	//fprintf(stdout,"EOC Marker hit %x\n", EoC);
-	getRootDirectoryContents(firstSectorClusterRD);
-	getRootDirectoryContents(secondSectorClusterRD);
+ 	}
 
 }
 
@@ -251,7 +248,9 @@ bool Filesystem::getDirectoryClusterNumber(string directory)
 				
 				// Trims and converts to uppercase the record and directoryname
 				recordName = normalizeToUppercase(recordName, ' ');
-				directory = normalizeToUppercase(directory, '.');
+				/*if(recordName[0] == '.')
+					cout << "dot stuff" << endl;*/
+				directory = normalizeToUppercase(directory, ' ');
 				
 				if(recordName == directory)
 				{
@@ -274,6 +273,7 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector, bool store)
 		
 		// If it's a long file name, skip over the record.
 			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
+			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0) == 229)continue;	
 			//if the record is empty, then break, because we have reached the end of the sector, or cluster? does it really matter?
 			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0) == 0)break;	
 			for (int j = 0; j < 11; j++)
@@ -281,6 +281,7 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector, bool store)
 				//fprintf(stderr,"inner counter index: %d\n", j);
 				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
 				dirRecord.name[j] = (char)parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + j);
+				if((int)dirRecord.name[0] == 229)break;
 				fprintf(stdout,"%c", dirRecord.name[j]);
 				
 			}
@@ -348,7 +349,7 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 		
 		while(recordName == directoryName && (int)files[i].attr == 16 && x!=0)
 		{
-			cout <<"currentClusterLocation" <<currentClusterLocation << endl;
+			//cout <<"currentClusterLocation" <<currentClusterLocation << endl;
 			if(directoryName == ".")
 			{
 				currentClusterLocation = files[i].fClusterLocation;
@@ -362,8 +363,9 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 						workingDirectory = "root";
 						return true;
 					}
-					if(files[i].fClusterLocation == currentClusterLocation)
+				if(files[i].fClusterLocation == currentClusterLocation)
 					{
+						cout << "what" << endl;
 						currentClusterLocation = files[i].fClusterLocation;
 						//findDirectoriesForCluster(files[i].fClusterLocation,2);
 						return true;
@@ -374,9 +376,13 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 			x--;
 			string filename = convertCharNameToString(x,11);
 			filename = normalizeToUppercase(filename, ' ');
+			cout << "filename" << filename << endl;
+			cout << ".. cluster location" << files[x].fClusterLocation << endl;
+			cout <<"current cluster location" <<currentClusterLocation << endl;
 			//First time this block of code runs, currentClusterLocaiton is the root cluster;
 			if(filename == "..")
 			{
+				cout << "test" << endl;
 				if(files[x].fClusterLocation == currentClusterLocation || files[x].fClusterLocation == 0)
 				{
 					
@@ -388,6 +394,7 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 			
 			if(currentClusterLocation == 2 )
 			{
+				
 				currentClusterLocation = files[i].fClusterLocation;
 				findDirectoriesForCluster(files[i].fClusterLocation,2);
 				return true;
@@ -435,6 +442,7 @@ return false;
     also checks if the directory already exists in the current
     working directory
     
+    A
     NYI
 */
 void Filesystem::makeDirectory(string directoryName){
@@ -498,60 +506,9 @@ void Filesystem::changeDirectory(string directoryName)
 	or a directory. 
 */
 int Filesystem::directoryExists(string directoryName, int type){
-	int dirPos = -1;
 	
-	// Will return the position of the . found in the files array if the file
-	// or directory looking for isn't found will return -1
 	
-	// unsigned int v;
-	// cout << "last IFile " << lastIFileLocation << endl;
-	// // Go upwards till we find a ..
-	// for(v = lastIFileLocation; convertCharNameToString(v, 11) != ".."  && v != 0; v--){
-	// 	cout << convertCharNameToString(v, 11) << endl;
-	// }
-	// cout << "v is " << v << endl;
-	/*
-		We must note that the directory name the user enters may just be RED 
-		(no spaces) but the stored value may contain spaces so we must know when
-		to ignore that.
-	*/
-	for(unsigned int i = 0; i < files.size(); i++)
-	{
-		/*
-			To check if a diretory exists we are checking our current working
-			folder. The way we do that is go through all our files till we find
-			the occurence of it. The one issue we have we this is it will only
-			find the first occurence so if multiple folders exist with the same
-			name things are going to be a bit haywire.
-			
-			I have tried a way around which is to take the index of the last value we 
-			cd'd into and then going up to find it's . and down but this will only
-			fix non cd issues.
-		*/
-		// Go through file name one character at a time
-		// and add its name to the recordName
-		string recordName = convertCharNameToString(i, 11);
-		
-		// Once we find a . we're done itterating through the folder
-		/* whaaaaaaat
-		if(recordName == "."){
-			dirPos = -1;
-			break;
-		}
-		*/
-
-		// cout << "Record Name: " << recordName << endl;
-		// cout << "Record Name: " << recordName.length() << endl;
-		
-		// //fprintf()
-		// cout << "Directory Name: " << directoryName << endl;
-		// cout << "Directory Name: " << directoryName.length() << endl;
-
-		// Trims and converts to uppercase the record and directoryname
-		recordName = normalizeToUppercase(recordName, ' ');
-		directoryName = normalizeToUppercase(directoryName, '.');
-		
-		int propertyType;
+	int propertyType;
 		switch(type){
 			// 0 is folder
 			case 0:
@@ -565,18 +522,60 @@ int Filesystem::directoryExists(string directoryName, int type){
 				propertyType = 16;
 			break;
 		}
+
+	bool dirFound = false;
+	/*
+		We must note that the directory name the user enters may just be RED 
+		(no spaces) but the stored value may contain spaces so we must know when
+		to ignore that.
+	*/
+
+	for(unsigned int i = 0; i < files.size(); i++)
+	{
+		int x = i;
+		string recordName = convertCharNameToString(i, 11);
+		cout << x << endl;
+		// Go through file name one character at a time
+		// and add its name to the recordName
+		// for(int j = 0; j < 11; j++)
+		// {
+		// 	char readInChar = files[i].name[j];
+		// 	recordName.push_back(readInChar);
+		// }	
 		
-		// If directory and recordname = directorName
-		if(recordName == directoryName && (int)files[i].attr == propertyType)
+		cout << "Record Name: " << recordName << "   " << "cluster number: " << files[i].fClusterLocation << endl;
+		
+		
+		recordName = normalizeToUppercase(recordName, ' ');
+		directoryName = normalizeToUppercase(directoryName, ' ');
+		while(recordName == directoryName && (int)files[i].attr == propertyType && x!=0)
 		{
+			if(currentClusterLocation == 2 )
+			{
+				currentFileIndex = i;
+				return 2;
+			}
 			
-			// FIX ME
-			dirPos = 1; // Directories found
-			break;
+			x--;
+			string filename = convertCharNameToString(x,11);
+			filename = normalizeToUppercase(filename, ' ');
+			//First time this block of code runs, currentClusterLocaiton is the root cluster;
+			if(filename == "..")
+			{
+				if(files[x].fClusterLocation == currentClusterLocation || files[x].fClusterLocation == 0)
+				{
+						currentFileIndex = i;
+						return files[x-1].fClusterLocation;
+				}
+			}
+			
+			
+
 		}
 	
+	
 	}
-	return dirPos;
+	return -1;
 }
 
 /*
@@ -629,20 +628,20 @@ void Filesystem::openFile(string file_name, string mode)
 void Filesystem::removeFile(string file)
 {
 	filetoRemove = file;
-	int dotClusterIndex = directoryExists(filetoRemove,1);
-	int dotCluster = files[dotClusterIndex].fClusterLocation;
-	 if(dotClusterIndex != -1)
+	int fileIndex = directoryExists(filetoRemove,1);
+	//int dotCluster = files[dotClusterIndex].fClusterLocation;
+	 if(fileIndex != -1)
 	 {
-   		for(int i = 0; 0 < files.size(); i++)
-   		{
-   			string compare = "";
-   			compare = convertCharNameToString(i);
-   			if (compare == file && files[i].currentFolder == workingDirectory)
-   				files[i].name[0] = 229;
-   		}
-   		cout << "The file " << filetoRemove << "  exists in the current directory." << endl;
-     	findDirectoriesForCluster(dotCluster,1);
-	 }
+				string compare = "";
+   			compare = convertCharNameToString(fileIndex);
+   			cout << "file will be removed" << endl;
+   			if(currentClusterLocation == 2)
+   			{
+   			findDirectoriesForCluster(2,1);
+   			}
+   			findDirectoriesForCluster(files[fileIndex].fClusterLocation,1);
+				files[currentFileIndex].name[0] = 229;
+		}
     // Otherwise we didnt find the directory
     else
     {
@@ -655,16 +654,18 @@ void Filesystem::removeFile(string file)
 void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemove)
 {
 	fileRecord dirRecord;
-	
+	cout << directoryDataSector << endl;
+	//openImage();
 	
 	for(int i = 0; i < BPB_BytsPerSec/32; i++)
 		{
 			string recordName = "";
 		// If it's a long file name, skip over the record.
 			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
-			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 16)continue;	
+			//if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 16)continue;	
 			//if the record is empty, then break, because we have reached the end of the sector, or cluster? does it really matter?
 			if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0) == 0)break;	
+			
 			for (int j = 0; j < 11; j++)
 			{
 				//fprintf(stderr,"inner counter index: %d\n", j);
@@ -680,13 +681,21 @@ void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemo
 				recordName.push_back(readInChar);
 			}
 			// Set the file to deleted in the filesystem
-			if(filetoRemove == recordName)
+			/*if(filetoRemove == recordName)
 			{
+				cout << "setting byte" << endl;	
+				uint8_t bytes[] = {0xE5};
+				cout << bytes[0] << endl;
+				long offset = (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0;
+				fseek(imageFile,offset,SEEK_SET);
+				fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
 				
-			
-			}
+				/*offset = (directoryDataSector * BPB_BytsPerSec) + i * 32 + 1;
+				fseek(imageFile,offset,SEEK_SET);
+				fwrite(byte[1],sizeof(char),sizeof(byte),imageFile);*/
+			//}
 			//fprintf(stderr,"outer counter index: %d\n", i);
-			if ((int)dirRecord.name[1] < 10 )continue;
+			/*if ((int)dirRecord.name[1] < 10 )continue;
 			
 			//refer to the filesystem spec instead of the dumb slides, the offsets were wrong, and were ORing time stamps.
 			dirRecord.attr = parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11);
@@ -696,15 +705,16 @@ void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemo
 			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
 			dirRecord.highCluster <<= 16;
 			dirRecord.fClusterLocation = dirRecord.highCluster | dirRecord.lowCluster;
-			
+			*/
 		}
+		//closeImage();
 }
 
 
 void Filesystem::openImage()
 {
 	
-  imageFile = fopen (fname,"wb");
+  imageFile = fopen (fname,"r+");
   // If file not found
   if (imageFile==NULL){
   	perror ("Error opening file");
@@ -726,6 +736,8 @@ void Filesystem::displayVectorContents()
 }
 
 
-	
-
+void Filesystem::closeImage()
+{
+	fclose(imageFile);
+}
 
