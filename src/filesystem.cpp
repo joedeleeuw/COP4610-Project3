@@ -651,11 +651,11 @@ void Filesystem::fsinfo()
 
 void Filesystem::openFile(string file_name, string mode)
 {
-	if(directoryExists(file_name, 0))
-		cout << "file to open is not a file" << endl;
-	if(directoryExists(file_name, 1) == -1)
+	if(directoryExists(file_name, 0) >= 0)
+		cout << "File to open is not a file" << endl;
+	else if(directoryExists(file_name, 1) == -1)
 	{
-		cout << "the file does not exist" << endl;
+		cout << "The file " << file_name << " does not exist" << endl;
 	}
 	
 	if(fileTable.count(files[currentFileIndex].unique) == 0)
@@ -668,7 +668,7 @@ void Filesystem::openFile(string file_name, string mode)
 			permType = 1;
 		}
 		fileTable[files[currentFileIndex].unique] = permType;
-		cout << file_name << " Has been opened with" << " mode" << endl;
+		cout << file_name << " Has been opened with" << " mode" << mode << endl;
 	}
 	else
 	cout << "file is already open" << endl;

@@ -10,6 +10,8 @@ Commands done
 fsinfo 
 ls
 cd
+rm
+open
 
 Fixed
 
