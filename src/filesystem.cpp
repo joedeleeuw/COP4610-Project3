@@ -147,6 +147,7 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 			recordName="";
 			// If it's a long file name, skip over the record.
 			if((int)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
+			if((int)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 0) == 229)continue;	
 			//if the record is empty, then break, because we have reached the end of the sector, or cluster? does it really matter?
 			if((int)*(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 0) == 0)break;	
 			for (int j = 0; j < 11; j++)
@@ -166,7 +167,7 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 			record.highCluster = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 20);
 			record.lowCluster = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 26);
 			record.LstACC = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 18);
-			record.fileSize = parseInteger<uint32_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 28);
+			record.fileSize = 512;
 			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
 			record.highCluster <<= 16;
 			record.fClusterLocation = record.highCluster | record.lowCluster;
@@ -207,13 +208,13 @@ Call function to read from data sector in this function.
 
 void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 {
-	
+	//EOC chain is 268435455
 	int dataSector;
 	uint32_t nextCluster;
-	FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
-	while(clusterIndex != 268435455)
+	while(clusterIndex  != 268435455)
 	{
-		
+		FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
+
 		dataSector = findFirstSectorOfCluster(clusterIndex);
 		// Gets the FATEntry for the location of the next directory cluster
 		FATEntryRCluster = this->findFatEntry(clusterIndex);
@@ -221,14 +222,14 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 		nextCluster = parseInteger<uint32_t>(fdata + FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum * BPB_BytsPerSec);
 		clusterIndex = nextCluster;
 		//this will be called for as many additional clusters there are for a directory.
-		if(toDo == 0)
-		PrintCurrentDirectory(dataSector);
-		// If removing file
-		if(toDo == 1)
-		readFilesystemforFile(dataSector,filetoRemove);
-		if(toDo == 2)
-		PrintCurrentDirectory(dataSector, true);
-		
+		if(toDo == 0){
+			PrintCurrentDirectory(dataSector);
+			// If removing file
+		}else if(toDo == 1){
+			readFilesystemforFile(dataSector,filetoRemove);
+		}else if(toDo == 2){
+			PrintCurrentDirectory(dataSector, true);
+		}		
 	}	
 	
 	fprintf(stdout,"EOC Marker hit %x\n", clusterIndex);
@@ -395,13 +396,14 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 			{
 				if(files[i].fClusterLocation == 0)
 					{
+						
 						currentClusterLocation = 2;
 						workingDirectory = "root";
 						return true;
 					}
 				if(files[i].fClusterLocation == currentClusterLocation)
 					{
-						cout << "what" << endl;
+						
 						currentClusterLocation = files[i].fClusterLocation;
 						//findDirectoriesForCluster(files[i].fClusterLocation,2);
 						return true;
@@ -562,9 +564,7 @@ int Filesystem::directoryExists(string directoryName, int type){
 		
 		recordName = normalizeToUppercase(recordName, ' ');
 		directoryName = normalizeToUppercase(directoryName, ' ');
-		cout << "recordName" << recordName;
-		cout << 
-		while(recordName == directoryName && (int)files[i].attr == propertyType && x!=0)
+		while(recordName == directoryName && (int)files[i].attr == propertyType)
 		{
 			if(currentClusterLocation == 2 )
 			{
@@ -684,6 +684,8 @@ void Filesystem::closeFile(string file_name)
 
 void Filesystem::removeFile(string file)
 {
+	// Converts file
+	file = normalizeToUppercase(file, '.');
 	filetoRemove = file;
 	// Returns the . index value
 	int fileIndex = directoryExists(filetoRemove,1);
@@ -697,7 +699,6 @@ void Filesystem::removeFile(string file)
    			findDirectoriesForCluster(2,1);
    			}
    			findDirectoriesForCluster(fileIndex,1);
-			
 			files[currentFileIndex].name[0] = 229;
 	}
     // Otherwise we didnt find the directory
@@ -716,8 +717,15 @@ void Filesystem::removeFile(string file)
 void Filesystem::removeDirectory(string directoryName){
 	// Converts directoryName
 	directoryName = normalizeToUppercase(directoryName, '.');
+	
+	filetoRemove = directoryName;
+	
 	// Returns the . index value
 	int fileIndex = directoryExists(directoryName, 0);
+	
+	// Check to see if the directory contains any subfolders
+	// bool dirEmpty = 
+	
 	//int dotCluster = files[dotClusterIndex].fClusterLocation;
 	// If directory found
 	 if(fileIndex != -1)
@@ -785,7 +793,6 @@ void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemo
 				long offset = (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0;
 				fseek(imageFile,offset,SEEK_SET);
 				fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
-				
 			}
 			//fprintf(stderr,"outer counter index: %d\n", i);
 			if ((int)dirRecord.name[1] < 10 )continue;
@@ -800,6 +807,7 @@ void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemo
 			dirRecord.fClusterLocation = dirRecord.highCluster | dirRecord.lowCluster;
 			
 		}
+		
 		closeImage();
 }
 
@@ -849,4 +857,58 @@ void Filesystem::entrySize(string entry_name)
 		cout << "size of entry " << entry_name << " is " << files[currentFileIndex].fileSize << endl;
 	}
 
+}
+
+void Filesystem::Read(string file_name,int start_pos,int num_bytes)
+{
+	// openImage();
+	// for(int i = 0; i < num_bytes; i++)
+	// long offset = (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0;
+	// fseek(imageFile,offset,SEEK_SET);
+	// fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
+
+	
+}
+
+/*
+	Checks if the directory is empty in currentFileIndex
+	by finding the first . and .. and then seeing if their is anything
+	between that record and the next . and ..
+*/
+bool Filesystem::verifyEmptyDirectory(int directoryDataSector)
+{
+	// 	int recordsFound = 4;
+	// 	for(int i = 0; i < BPB_BytsPerSec/32; i++)
+	// 	{
+			
+	// 		string recordName = "";
+	// 	// If it's a long file name, skip over the record.
+	// 		if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;	
+	// 		//if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11) == 16)continue;	
+	// 		//if the record is empty, then break, because we have reached the end of the sector, or cluster? does it really matter?
+	// 		if((int)*(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0) == 0) return (recordsFound == 0 ? true : false);	
+			
+	// 		for (int j = 0; j < 11; j++)
+	// 		{
+	// 			//fprintf(stderr,"inner counter index: %d\n", j);
+	// 			//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
+	// 			dirRecord.name[j] = (char)parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + j);
+	// 			fprintf(stdout,"%c", dirRecord.name[j]);
+				
+	// 		}
+	// 		for(int j = 0; j < 11; j++)
+	// 		{
+	// 			char readInChar = dirRecord.name[j];
+	// 			recordName.push_back(readInChar);
+	// 		}	
+	// 		recordName.erase(remove(recordName.begin(), recordName.end(), ''), recordName.end()); 
+	// 	// If we contain a . or .. then decrement counter
+	// 	if(recordName = "." || recordName = ".."){
+	// 		recordsFound--;
+	// 	}
+	
+	// }
+	
+	// return (recordsFound == 0 ? true : false);
+	return true;
 }

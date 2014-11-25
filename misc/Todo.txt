@@ -6,6 +6,11 @@ Can cd or ls to a directory which is not the child of the current. See MiscNotes
 . and .. not being parsed corectly may have to do with the ls and cd stuff. Partly
 implemented.
 
+Cant rm or rmdir anything in main directory. Need to check if directory is empty
+before removing directory. Also printing out directories in root directory.
+
+ls .. doesn't work it causes a crash
+
 Commands done 
 fsinfo 
 ls

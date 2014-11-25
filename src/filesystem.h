@@ -79,8 +79,8 @@ public:
 	int binaryAdd(int, int);
 	void displayVectorContents();
 	void closeImage();
-
-
+	bool verifyEmptyDirectory(int);
+	void Read(string,int,int);
 //private:
 
 	/* The cluster number of the first cluster of the root directory.*/

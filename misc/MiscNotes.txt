@@ -5,12 +5,6 @@ get to next cluster. To get to the next one take current cluster, index into fil
 it will give you the next cluster number. Checking if their is or isnt a next cluster or if at the
 end of your linked list.
 
-To check if a diretory exists we are checking our current working
-folder. The way we do that is go through all our files till we find
-the occurence of it. The one issue we have we this is it will only
-find the first occurence so if multiple folders exist with the same
-name things are going to be a bit haywire.
-
 I have tried a way around which is to take the index of the last value we 
 cd'd into and then going up to find it's . and down but this will only
 fix non cd issues.
