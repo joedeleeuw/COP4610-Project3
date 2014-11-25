@@ -2,7 +2,7 @@
 #define FILESYSTEM_H
 
 // Debugging flag
-const bool DEBUG = true;
+const bool DEBUG = false;
 
 /*
 	Contains code for calling out commands from the userspace (ls etc.)
@@ -84,6 +84,8 @@ public:
 	void closeImage();
 	bool verifyEmptyDirectory(int);
 	void Read(string,int,int);
+	void Write(string,int,string);
+	void Undelete();
 //private:
 
 	/* The cluster number of the first cluster of the root directory.*/
@@ -132,6 +134,7 @@ public:
 	unsigned int lastIFileLocation; // Contains the index value of the last file we read in
 	FILE * imageFile;								// so we can check if a file exists later on
 	int dataSector;
+	bool isChangeDirectory;
 	//index for current file found in directoryExists
 	int currentFileIndex;
 	vector<fileRecord> files;

@@ -50,6 +50,7 @@ int main (int argc, char* argv[])
 	// Keep getting input until the user exits out
 	while (input != 'x')
     {
+      fs->isChangeDirectory = false;
       input = handleCommand(argc, argv,fs);
     }
     
@@ -119,8 +120,9 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	{
 		if (userArgs[3] == ""){
 			printf("%s\n", "wrong amount of arguments supplied");
-		}else{
-			
+		}else
+		{
+			fs->Write(userArgs[1],atoi(userArgs[2].c_str()),userArgs[3]);	
 		}
 	}
 	else if (userArgs[0].compare("rm")== 0)
@@ -138,6 +140,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 			printf("%s\n", "wrong amount of arguments supplied");
 		}else
 		{
+			fs->isChangeDirectory = true;
 			fs->changeDirectory(userArgs[1]);	
 		}
 	}
@@ -181,7 +184,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 		if (userArgs[1] != ""){
 			printf("%s\n", "wrong amount of arguments supplied");
 		}else{
-			
+			fs->Undelete();
 		}
 	}
     else if (userArgs[0].compare("quit") == 0)

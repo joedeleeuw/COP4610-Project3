@@ -156,9 +156,11 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 				//fprintf(stderr,"inner counter index: %d\n", j);
 				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
 				record.name[j] = (char)parseInteger<uint8_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + j);
+				if(DEBUG)
 				fprintf(stdout,"%c", record.name[j]);
 				
 			}
+			if(DEBUG)
 			cout << " ";
 			//fprintf(stderr,"outer counter index: %d\n", i);
 			if ((int)record.name[1] < 10 )continue;
@@ -235,6 +237,7 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 		}
 	}	
 	
+	if(DEBUG)
 	fprintf(stdout,"EOC Marker hit %x\n", clusterIndex);
 
 	
@@ -299,9 +302,11 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector, bool store)
 				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
 				dirRecord.name[j] = (char)parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + j);
 				if((int)dirRecord.name[0] == 229)break;
+				if(isChangeDirectory == false)
 				fprintf(stdout,"%c", dirRecord.name[j]);
 				
 			}
+			if(isChangeDirectory == false)
 			cout << " ";
 			//fprintf(stderr,"outer counter index: %d\n", i);
 			if ((int)dirRecord.name[1] < 10 )continue;
@@ -325,6 +330,7 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector, bool store)
 			dirRecord.currentFolder = workingDirectory;
 			dirRecord.fileSize =  parseInteger<uint32_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 28);
 			// If were going to store and the file hasn't been pushed yet
+			//cout << "Next Cluster Location: " << dirRecord.fClusterLocation << endl;
 			if(store == true && valuesStoredMap.count(dirRecord.unique) == 0){
 					if(dirRecord.name[0] == '.' && dirRecord.name[1] == ' '){
 						dirRecord1 = dirRecord;
@@ -340,7 +346,7 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector, bool store)
 			}
 				
 			
-			
+			if(isChangeDirectory == false)
 			cout << endl;
 		}
 }
@@ -509,12 +515,14 @@ void Filesystem::changeDirectory(string directoryName)
 	workingDirectory = directoryName;
 	if(directoryExistsAndChangeTo(directoryName))
 	{
+		if(DEBUG)
 		cout << "Working directory changed to " << directoryName  << endl;
 		
 	}
 	else
 	{
 		workingDirectory = previousWorkingDirectory;
+		if(DEBUG)
 		cout << "Directory " << directoryName << " was not found" << endl;
 		return;
 	}
@@ -660,6 +668,10 @@ void Filesystem::openFile(string file_name, string mode)
 			permType = 0;
 		}else if(mode == "w"){
 			permType = 1;
+		}
+		else if (mode == "rw")
+		{
+			permType = 2;
 		}
 		fileTable[files[currentFileIndex].unique] = permType;
 		cout << file_name << " Has been opened with" << " mode " << mode << endl;
@@ -886,12 +898,24 @@ void Filesystem::Read(string file_name,int start_pos,int num_bytes)
 		return;
 		
 	}
-	cout << "test" << endl;
 	findDirectoriesForCluster(files[currentFileIndex].fClusterLocation,3);
 	
 	if(files[currentFileIndex].fileSize < start_pos)
 	{
 		cout << "start position is greater than file size" << endl;
+		return;
+	}
+	//checks to see if the file exists in the open file table
+	if(fileTable.count(files[currentFileIndex].unique) == 0)
+	{
+		cout << "file " << file_name << "is not in the open file table" << endl;
+		return;
+	}
+	//checks to see if file in open file table is open for writing not reading or rw
+	if(fileTable[files[currentFileIndex].unique] == 1)
+	{
+		cout << "file " << file_name << "is not open for reading" << endl;
+		return;
 	}
 	for(int j = 0; j < num_bytes; j++)
 	{
@@ -903,6 +927,60 @@ void Filesystem::Read(string file_name,int start_pos,int num_bytes)
 	}
 	closeImage();
 }
+
+void Filesystem::Write(string file_name, int start_pos,string quoted_data)
+{
+	quoted_data.erase(remove(quoted_data.begin(), quoted_data.end(), '"'), quoted_data.end());   
+	cout << "Quoted data: " << quoted_data	 << endl;
+	file_name = normalizeToUppercase(file_name, '.'); 
+	int charCount = quoted_data.length();
+	cout << "character count: " << charCount << endl;
+	openImage();
+
+	uint8_t *bytes = new uint8_t[quoted_data.size()+1];
+	bytes[quoted_data.size()]=0;
+	memcpy(bytes,quoted_data.c_str(),quoted_data.size());
+
+
+	if(directoryExists(file_name,1) < 0)
+	{
+		cout << "file" << file_name << " is not a file" << endl;
+		return;
+	}
+	findDirectoriesForCluster(files[currentFileIndex].fClusterLocation,3);
+	
+	if(fileTable.count(files[currentFileIndex].unique) == 0)
+	{
+		cout << "file " << file_name << "is not in the open file table" << endl;
+		return;
+	}
+	//checks to make sure that the file open for writing, if not, return
+	if(fileTable[files[currentFileIndex].unique] != 1)
+	{
+		cout << "file " << file_name << "is not open for writing" << endl;
+		return;
+	}
+	
+
+	if(start_pos + charCount > files[currentFileIndex].fileSize)
+	{
+		files[currentFileIndex].fileSize += start_pos + charCount;
+		
+	}
+	for(int j = 0; j < charCount; j++)
+	{
+		cout << "writing" << endl;
+		long offset = (dataSector * BPB_BytsPerSec) + start_pos  + j;
+		fseek(imageFile,offset,SEEK_SET);
+		fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
+		
+
+	}
+
+	closeImage();
+}
+
+
 /*
 	Checks if the directory is empty in currentFileIndex
 	by finding the first . and .. and then seeing if their is anything
@@ -948,4 +1026,11 @@ bool Filesystem::verifyEmptyDirectory(int directoryDataSector)
 	}
 	
 	return (recordsFound == 0) ? false : true;	
+}
+
+void Filesystem::Undelete()
+{
+
+
+
 }
