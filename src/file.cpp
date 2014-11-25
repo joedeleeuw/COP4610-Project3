@@ -9,11 +9,13 @@ string File::normalizeToUppercase(string valueToNormalize, char characterToRemov
     //cout << "first character of User input String " << (char)valueToNormalize[1] << endl;
     // Trim the character to remove if one is passed in
 	  
-      //if((char)valueToNormalize[0] != '.' || (char)valueToNormalize[1] != '.')
-      valueToNormalize.erase(remove(valueToNormalize.begin(), valueToNormalize.end(), characterToRemove), valueToNormalize.end());   
+      //if(valueToNormalize[0] != '.' || valueToNormalize[1] != '.'){
+          valueToNormalize.erase(remove(valueToNormalize.begin(), valueToNormalize.end(), characterToRemove), valueToNormalize.end());   
+      //}
+      
 		
 		// Uppercase record
-		if((char)valueToNormalize[0] != '.' || (char)valueToNormalize[1] != '.')
+		if(valueToNormalize[0] != '.' || valueToNormalize[1] != '.')
     transform(valueToNormalize.begin(), valueToNormalize.end(), valueToNormalize.begin(),::toupper);
 		
 		return valueToNormalize;

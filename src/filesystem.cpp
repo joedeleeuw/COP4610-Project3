@@ -410,9 +410,9 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 			x--;
 			string filename = convertCharNameToString(x,11);
 			filename = normalizeToUppercase(filename, ' ');
-			cout << "filename" << filename << endl;
-			cout << ".. cluster location" << files[x].fClusterLocation << endl;
-			cout <<"current cluster location" <<currentClusterLocation << endl;
+			// cout << "filename" << filename << endl;
+			// cout << ".. cluster location" << files[x].fClusterLocation << endl;
+			// cout <<"current cluster location" <<currentClusterLocation << endl;
 			//First time this block of code runs, currentClusterLocaiton is the root cluster;
 			if(filename == "..")
 			{
@@ -425,6 +425,7 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 				}
 			}
 			
+			// If were in the root directory
 			if(currentClusterLocation == 2 )
 			{
 				
@@ -564,7 +565,7 @@ int Filesystem::directoryExists(string directoryName, int type){
 	{
 		int x = i;
 		string recordName = convertCharNameToString(i, 11);
-		cout << x << endl;
+		//cout << x << endl;
 		// Go through file name one character at a time
 		// and add its name to the recordName
 		// for(int j = 0; j < 11; j++)
@@ -573,7 +574,7 @@ int Filesystem::directoryExists(string directoryName, int type){
 		// 	recordName.push_back(readInChar);
 		// }	
 		
-		cout << "Record Name: " << recordName << "   " << "cluster number: " << files[i].fClusterLocation << endl;
+		//cout << "Record Name: " << recordName << "   " << "cluster number: " << files[i].fClusterLocation << endl;
 		
 		
 		recordName = normalizeToUppercase(recordName, ' ');
@@ -589,13 +590,15 @@ int Filesystem::directoryExists(string directoryName, int type){
 			x--;
 			string filename = convertCharNameToString(x,11);
 			filename = normalizeToUppercase(filename, ' ');
+			
+			//cout << "filename " << filename <<  " current cluster loc " << currentClusterLocation << " filesx fCluster "  << files[x].fClusterLocation << endl;
 			//First time this block of code runs, currentClusterLocaiton is the root cluster;
-			if(filename == "..")
+			if(filename == ".")
 			{
 				if(files[x].fClusterLocation == currentClusterLocation || files[x].fClusterLocation == 0)
 				{
 						currentFileIndex = i;
-						return files[x-1].fClusterLocation;
+						return files[x].fClusterLocation;
 				}
 			}
 			
@@ -687,7 +690,7 @@ void Filesystem::removeFile(string file)
    			{
    			findDirectoriesForCluster(2,1);
    			}
-   			findDirectoriesForCluster(files[fileIndex].fClusterLocation,1);
+   			findDirectoriesForCluster(fileIndex,1);
 			
 			files[currentFileIndex].name[0] = 229;
 	}
@@ -704,7 +707,7 @@ void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemo
 {
 	fileRecord dirRecord;
 	cout << directoryDataSector << endl;
-	//openImage();
+	openImage();
 	
 	for(int i = 0; i < BPB_BytsPerSec/32; i++)
 		{
@@ -729,21 +732,22 @@ void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemo
 				char readInChar = dirRecord.name[j];
 				recordName.push_back(readInChar);
 			}
+			recordName = normalizeToUppercase(recordName, ' ');
+			
+			cout << "File to remove " << filetoRemove << endl;
+			cout << "Record name " << recordName << endl;
 			
 			// Set the file to deleted in the filesystem
-			/*if(filetoRemove == recordName)
+			if(filetoRemove == recordName)
 			{
 				cout << "setting byte" << endl;	
 				uint8_t bytes[] = {0xE5};
-				cout << bytes[0] << endl;
+				//cout << bytes[0] << endl;
 				long offset = (directoryDataSector * BPB_BytsPerSec) + i * 32 + 0;
 				fseek(imageFile,offset,SEEK_SET);
 				fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
 				
-				offset = (directoryDataSector * BPB_BytsPerSec) + i * 32 + 1;
-				fseek(imageFile,offset,SEEK_SET);
-				fwrite(byte[1],sizeof(char),sizeof(byte),imageFile);
-			//}
+			}
 			//fprintf(stderr,"outer counter index: %d\n", i);
 			if ((int)dirRecord.name[1] < 10 )continue;
 			
@@ -755,9 +759,9 @@ void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemo
 			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
 			dirRecord.highCluster <<= 16;
 			dirRecord.fClusterLocation = dirRecord.highCluster | dirRecord.lowCluster;
-			*/
+			
 		}
-		//closeImage();
+		closeImage();
 }
 
 
