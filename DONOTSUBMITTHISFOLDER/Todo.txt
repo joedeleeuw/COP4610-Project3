@@ -11,11 +11,18 @@ before removing directory. Also printing out directories in root directory.
 
 ls .. doesn't work it causes a crash
 
+-------------------------------------
 MUST BE DONE
 Readme
 Finish Report
+Add missing functionality, bugs/issues, your suggestions for assignment write up ,and any logs want to report.docx
 remove couts that should be marked as debug or add if(DEBUG) to only print out
 Submit file (src and Documentation folder)
+Add docblocks (/* */) to the top of every function explaining what it does
+TEST PROGRAM THOROGUHLY BEFORE SUBMITTING
+CHECK the program isn't corrupted after uploading and that the report can still be opened.
+END MUST BE DONE
+-------------------------------------
 
 Commands done 
 fsinfo 
@@ -32,3 +39,7 @@ Fixed
 Cant cd without doing ls first. We need to just abstract the ls code a bit more.
 And then intergrate that with cd. At the moment cd only checks if the directory
 exists and doesn't do much else.
+
+JOE:
+
+look at page 23 and 24 on the fat32 spec, it shows you how to create a directory, as well as how to see how many clusters are associated with a directory(to size it, just multiply 
