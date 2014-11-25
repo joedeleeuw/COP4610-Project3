@@ -91,7 +91,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 		if (userArgs[1] == ""){
 			printf("%s\n", "wrong amount of arguments supplied");
 		}else{
-			
+			fs->closeFile(userArgs[1]);
 		}
 		
 	}

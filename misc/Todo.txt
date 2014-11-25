@@ -12,6 +12,7 @@ ls
 cd
 rm
 open
+close
 
 Fixed
 

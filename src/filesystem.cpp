@@ -651,11 +651,13 @@ void Filesystem::fsinfo()
 
 void Filesystem::openFile(string file_name, string mode)
 {
-	if(directoryExists(file_name, 0) >= 0)
+	if(directoryExists(file_name, 0) >= 0){
 		cout << "File to open is not a file" << endl;
-	else if(directoryExists(file_name, 1) == -1)
+		return;
+	}else if(directoryExists(file_name, 1) == -1)
 	{
 		cout << "The file " << file_name << " does not exist" << endl;
+		return;
 	}
 	
 	if(fileTable.count(files[currentFileIndex].unique) == 0)
@@ -674,7 +676,20 @@ void Filesystem::openFile(string file_name, string mode)
 	cout << "file is already open" << endl;
 }
 
-
+void Filesystem::closeFile(string file_name)
+{
+	// set current file index
+	directoryExists(file_name, 1);
+	
+	// If file is open
+	if(fileTable.count(files[currentFileIndex].unique) == 0){
+		cout << "The file " << file_name << " is not already open" << endl;
+	}
+	// Otherwise we remove it from the open file table
+	else{
+		fileTable.erase(files[currentFileIndex].unique);
+	}
+}
 
 void Filesystem::removeFile(string file)
 {
