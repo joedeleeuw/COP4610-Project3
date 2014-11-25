@@ -166,6 +166,7 @@ void Filesystem::getRootDirectoryContents(int FirstDataSector)
 			record.highCluster = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 20);
 			record.lowCluster = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 26);
 			record.LstACC = parseInteger<uint16_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 18);
+			record.fileSize = parseInteger<uint32_t>(fdata + (FirstDataSector * BPB_BytsPerSec) + i * 32 + 28);
 			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
 			record.highCluster <<= 16;
 			record.fClusterLocation = record.highCluster | record.lowCluster;
@@ -313,12 +314,12 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector, bool store)
 			dirRecord.attr = parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 11);
 			dirRecord.highCluster = parseInteger<uint16_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 20);
 			dirRecord.lowCluster = parseInteger<uint16_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 26);
-		 
+		 	
 			//we shift 16 bits for the or, because we are making room foor the bits in lowCluster for the addition(draw it out kid)
 			dirRecord.highCluster <<= 16;
 			dirRecord.fClusterLocation = dirRecord.highCluster | dirRecord.lowCluster;
 			dirRecord.currentFolder = workingDirectory;
-			
+			dirRecord.fileSize =  parseInteger<uint32_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + 28);
 			// If were going to store and the file hasn't been pushed yet
 			if(store == true && valuesStoredMap.count(dirRecord.unique) == 0){
 					if(dirRecord.name[0] == '.' && dirRecord.name[1] == ' '){
@@ -491,24 +492,6 @@ void Filesystem::makeDirectory(string directoryName){
 }
 
 /*
-    Removes a directory with the passed in directoryName,
-    also checks if the directory already exists in the current
-    working directory
-    
-    NYI
-*/
-void Filesystem::removeDirectory(string directoryName){
-    // Check if the directory already exists
-    if(directoryExists(directoryName) == -1){
-    	cout << "The directory " << directoryName << " already exists." << endl;
-    }
-    // Otherwise we remove the directory
-    else{
-    	
-    }
-}
-
-/*
 	Changes the directory and checks if it exists.
 	
 	TODO NYI - Need to check if directory would be transformed into version of what
@@ -579,10 +562,13 @@ int Filesystem::directoryExists(string directoryName, int type){
 		
 		recordName = normalizeToUppercase(recordName, ' ');
 		directoryName = normalizeToUppercase(directoryName, ' ');
+		cout << "recordName" << recordName;
+		cout << 
 		while(recordName == directoryName && (int)files[i].attr == propertyType && x!=0)
 		{
 			if(currentClusterLocation == 2 )
 			{
+				
 				currentFileIndex = i;
 				return 2;
 			}
@@ -651,6 +637,9 @@ void Filesystem::fsinfo()
 
 void Filesystem::openFile(string file_name, string mode)
 {
+	// converts passed in file name
+	file_name  = normalizeToUppercase(file_name, '.');
+	
 	if(directoryExists(file_name, 0) >= 0){
 		cout << "File to open is not a file" << endl;
 		return;
@@ -670,7 +659,7 @@ void Filesystem::openFile(string file_name, string mode)
 			permType = 1;
 		}
 		fileTable[files[currentFileIndex].unique] = permType;
-		cout << file_name << " Has been opened with" << " mode" << mode << endl;
+		cout << file_name << " Has been opened with" << " mode " << mode << endl;
 	}
 	else
 	cout << "file is already open" << endl;
@@ -678,6 +667,8 @@ void Filesystem::openFile(string file_name, string mode)
 
 void Filesystem::closeFile(string file_name)
 {
+	// converts passed in file name
+	file_name  = normalizeToUppercase(file_name, '.');
 	// set current file index
 	directoryExists(file_name, 1);
 	
@@ -715,6 +706,39 @@ void Filesystem::removeFile(string file)
     	cout << "File " << file << " not found" << endl;
     }
 	
+}
+
+/*
+    Removes a directory with the passed in directoryName,
+    also checks if the directory already exists in the current
+    working directory
+*/
+void Filesystem::removeDirectory(string directoryName){
+	// Converts directoryName
+	directoryName = normalizeToUppercase(directoryName, '.');
+	// Returns the . index value
+	int fileIndex = directoryExists(directoryName, 0);
+	//int dotCluster = files[dotClusterIndex].fClusterLocation;
+	// If directory found
+	 if(fileIndex != -1)
+	 {
+	 		cout << fileIndex << " file index" << endl;
+	 		
+			string compare = "";
+   			//compare = convertCharNameToString(fileIndex);
+   			if(currentClusterLocation == 2)
+   			{
+   			findDirectoriesForCluster(2,1);
+   			}
+   			findDirectoriesForCluster(fileIndex,1);
+			
+			files[currentFileIndex].name[0] = 229;
+	}
+    // Otherwise we didnt find the directory
+    else
+    {
+    	cout << "Directory " << directoryName << " not found" << endl;
+    }
 }
 
 
@@ -810,3 +834,19 @@ void Filesystem::closeImage()
 	fclose(imageFile);
 }
 
+void Filesystem::entrySize(string entry_name)
+{
+	cout << currentClusterLocation << endl;
+	if(directoryExists(entry_name,0) >= 0)
+	{
+		cout << "current file index" << currentFileIndex << endl;
+		cout << "size of entry" << entry_name << " is " << files[currentFileIndex].fileSize << endl;
+	}
+	
+	else if(directoryExists(entry_name,1) >= 0)
+	{
+		cout << "current file index" << currentFileIndex << endl;
+		cout << "size of entry " << entry_name << " is " << files[currentFileIndex].fileSize << endl;
+	}
+
+}

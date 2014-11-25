@@ -169,8 +169,9 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	{
 		if (userArgs[1] == ""){
 			printf("%s\n", "wrong amount of arguments supplied");
-		}else{
-			
+		}else
+		{
+			fs->entrySize(userArgs[1]);	
 		}
 	}
 	else if (userArgs[0].compare("undelete") == 0)
