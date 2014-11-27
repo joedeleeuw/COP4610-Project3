@@ -886,7 +886,7 @@ void Filesystem::entrySize(string entry_name)
 
 }
 
-void Filesystem::Read(string file_name,int start_pos,int num_bytes)
+void Filesystem::Read(string file_name, unsigned int start_pos,int num_bytes)
 {
 	file_name = normalizeToUppercase(file_name, '.'); 
 	
@@ -928,7 +928,7 @@ void Filesystem::Read(string file_name,int start_pos,int num_bytes)
 	closeImage();
 }
 
-void Filesystem::Write(string file_name, int start_pos,string quoted_data)
+void Filesystem::Write(string file_name, unsigned int start_pos,string quoted_data)
 {
 	quoted_data.erase(remove(quoted_data.begin(), quoted_data.end(), '"'), quoted_data.end());   
 	cout << "Quoted data: " << quoted_data	 << endl;

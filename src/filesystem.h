@@ -83,8 +83,8 @@ public:
 	void displayVectorContents();
 	void closeImage();
 	bool verifyEmptyDirectory(int);
-	void Read(string,int,int);
-	void Write(string,int,string);
+	void Read(string,unsigned int,int);
+	void Write(string,unsigned int,string);
 	void Undelete();
 //private:
 
