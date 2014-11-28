@@ -73,8 +73,14 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
     	userArgs[i] = commandBuffer;
     	i++;
     }
-   
-    if (userArgs[0].compare("fsinfo") == 0)
+    
+    // All userArgs[1] are file names, nothing, or directory names
+    // so as per the writeup if they contain a / we print out a message
+    size_t searchFor = userArgs[1].find("/");
+  	if (searchFor != string::npos){
+  		cout << "File, directory names and entry names may not contain a /" << endl;
+  	}
+    else if (userArgs[0].compare("fsinfo") == 0)
 	{
 		fs->fsinfo();
 	}

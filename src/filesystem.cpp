@@ -522,7 +522,7 @@ void Filesystem::changeDirectory(string directoryName)
 	else
 	{
 		workingDirectory = previousWorkingDirectory;
-		if(DEBUG)
+		//if(DEBUG)
 		cout << "Directory " << directoryName << " was not found" << endl;
 		return;
 	}
@@ -807,8 +807,10 @@ void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemo
 			}
 			recordName = normalizeToUppercase(recordName, ' ');
 			
-			cout << "File to remove " << filetoRemove << endl;
-			cout << "Record name " << recordName << endl;
+			if(DEBUG){
+				cout << "File to remove " << filetoRemove << endl;
+				cout << "Record name " << recordName << endl;
+			}
 			
 			// Set the file to deleted in the filesystem
 			if(filetoRemove == recordName)
