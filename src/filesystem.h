@@ -86,6 +86,7 @@ public:
 	void Read(string,unsigned int,int);
 	void Write(string,unsigned int,string);
 	void Undelete();
+	void addFile(int,string);
 //private:
 
 	/* The cluster number of the first cluster of the root directory.*/

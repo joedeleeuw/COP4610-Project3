@@ -724,7 +724,8 @@ void Filesystem::removeFile(string file)
    			}
    			findDirectoriesForCluster(fileIndex,1);
 			files[currentFileIndex].name[0] = 229;
-	}
+	
+}
     // Otherwise we didnt find the directory
     else
     {
@@ -1032,6 +1033,109 @@ bool Filesystem::verifyEmptyDirectory(int directoryDataSector)
 	
 	return (recordsFound == 0) ? false : true;	
 }
+
+void Filesystem::createFile(string filename)
+{
+  int dotCluster = directoryExists(filename,1);
+  if(dotCluster > 0)
+  {
+    cout << "file " << filename << " already exists" << endl;
+    return;
+  }
+  cout << "current cluster location" << currentClusterLocation << endl;
+ findDirectoriesForCluster(currentClusterLocation,3);
+ addFile(dataSector,filename);
+
+}
+
+void Filesystem::addFile(int dataSector,string filename)
+{
+  vector<fileRecord>::iterator iter;
+  openImage();
+  string currentWorkDirectory = normalizeToUppercase(workingDirectory, ' ');
+  
+  string recordName;
+  fileRecord record;
+  if(filename.size() != 11)
+    filename.resize(11);
+  uint8_t *bytes = new uint8_t[filename.size()+1];
+  bytes[filename.size()]=0;
+  memcpy(bytes,filename.c_str(),filename.size());
+  
+  record.currentFolder = workingDirectory;
+  if(DEBUG)
+    cout << "cluster sector"<<dataSector << endl;
+  //number of records, had to divide by 32, because we were reading too far.
+  for(int i = 0; i < BPB_BytsPerSec/32; i++)
+    {
+      
+      recordName="";
+      // If it's a long file name, skip over the record.
+      if((int)*(fdata + (dataSector * BPB_BytsPerSec) + i * 32 + 11) == 15)continue;  
+      if((int)*(fdata + (dataSector * BPB_BytsPerSec) + i * 32 + 0) == 229)continue;  
+      //if the record is empty, then break, because we have reached the end of the sector, or cluster? does it really matter?
+      //i dont know how to allocate a new cluster if it is full, assuming not..
+      if((int)*(fdata + (dataSector * BPB_BytsPerSec) + i * 32 + 0) == 0)
+      {
+        for(int z = 0; z < 11; z++)
+        {
+          record.name[z] = bytes[z];
+        }
+
+        cout << "im adding a file" << endl;
+        long offset = (dataSector * BPB_BytsPerSec) + i * 32 + 0;
+        fseek(imageFile,offset,SEEK_SET);
+        fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
+        
+        for(int j = 11; j < 32; j++)
+        {
+          if( j == 11)
+            {
+              uint8_t bytes[] = {0x20};
+              offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
+              fseek(imageFile,offset,SEEK_SET);
+              fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
+          }
+        if(j == 28)
+        {
+          int8_t bytes[] = {0x0,0x0,0x0,0x0};
+          offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
+          fseek(imageFile,offset,SEEK_SET);
+          fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
+        }
+        record.fileSize = 0;
+        record.attr = 32;
+      }
+      for(iter = files.begin();iter!=files.end(); iter++)
+      { 
+        cout << "omg" << endl;
+        if((char)(*iter).name[0] =='.' && (char)(*iter).name[1] !='.' )
+        {
+          cout << ".'s cluster location" << (*iter).fClusterLocation << endl;
+          cout << "current Cluster Location" << currentClusterLocation << endl;
+          if((*iter).fClusterLocation == currentClusterLocation)
+          {
+            files.insert(iter+2,record);
+            break;
+          }
+        }
+      }
+      break;
+    }
+      //fprintf(stderr,"outer counter index: %d\n", i);
+      if ((int)record.name[1] < 10 )continue;
+      
+      //refer to the filesystem spec instead of the dumb slides, the offsets were wrong, and were ORing time stamps.
+      
+      
+      
+       
+      
+    }
+
+  closeImage();
+}
+
 
 void Filesystem::Undelete()
 {

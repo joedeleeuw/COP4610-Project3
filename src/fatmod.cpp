@@ -106,8 +106,9 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	{
 		if (userArgs[1] == ""){
 			printf("%s\n", "Wrong amount of arguments supplied");
-		}else{
-			
+		}else
+		{
+			fs->createFile(userArgs[1]);
 		}
 		
 	}
