@@ -219,12 +219,12 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 	{
 		
 		FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
-
 		dataSector = findFirstSectorOfCluster(clusterIndex);
 		// Gets the FATEntry for the location of the next directory cluster
 		FATEntryRCluster = this->findFatEntry(clusterIndex);
 		//The second cluster number of the root directory. 
 		nextCluster = parseInteger<uint32_t>(fdata + FATEntryRCluster.FATOffset + FATEntryRCluster.FATsecNum * BPB_BytsPerSec);
+
 		clusterIndex = nextCluster;
 		//this will be called for as many additional clusters there are for a directory.
 		if(toDo == 0){
@@ -248,6 +248,7 @@ bool Filesystem::getDirectoryClusterNumber(string directory)
 {
 	string recordName;
 	bool foundRecord = false;
+				
 	for(unsigned int i = 0; i < files.size(); i++)
 		{
 			// If direcory
@@ -269,7 +270,14 @@ bool Filesystem::getDirectoryClusterNumber(string directory)
 					cout << "dot stuff" << endl;*/
 				directory = normalizeToUppercase(directory, ' ');
 				
-				if(recordName == directory)
+				// For now we make any use of .. go to 2 (root cluster)
+				if(directory == ".."){
+					//findDirectoriesForCluster(2, 0);
+					cout << "ls .. is currently disabled" << endl;
+					foundRecord = true;
+					break;
+				}
+				else if(recordName == directory)
 				{
 					findDirectoriesForCluster(files[i].fClusterLocation, 0);
 					foundRecord = true;
@@ -710,13 +718,14 @@ void Filesystem::removeFile(string file)
 {
 	// Converts file
 	file = normalizeToUppercase(file, '.');
+	cout << file << endl;
 	filetoRemove = file;
 	// Returns the . index value
 	int fileIndex = directoryExists(filetoRemove,1);
 	//int dotCluster = files[dotClusterIndex].fClusterLocation;
 	 if(fileIndex != -1)
-	 {
-			string compare = "";
+	 {	
+	 		string compare = "";
    			//compare = convertCharNameToString(fileIndex);
    			if(currentClusterLocation == 2)
    			{
@@ -724,7 +733,9 @@ void Filesystem::removeFile(string file)
    			}
    			findDirectoriesForCluster(fileIndex,1);
 			files[currentFileIndex].name[0] = 229;
-	
+		string hack = "#" + file;
+		
+		addFile(2050,hack);
 }
     // Otherwise we didnt find the directory
     else
@@ -1042,7 +1053,8 @@ void Filesystem::createFile(string filename)
     cout << "file " << filename << " already exists" << endl;
     return;
   }
-  cout << "current cluster location" << currentClusterLocation << endl;
+  if(DEBUG)
+  	cout << "current cluster location" << currentClusterLocation << endl;
  findDirectoriesForCluster(currentClusterLocation,3);
  addFile(dataSector,filename);
 
@@ -1053,6 +1065,9 @@ void Filesystem::addFile(int dataSector,string filename)
   vector<fileRecord>::iterator iter;
   openImage();
   string currentWorkDirectory = normalizeToUppercase(workingDirectory, ' ');
+  
+  // Uppercase the filename
+  transform(filename.begin(), filename.end(), filename.begin(),::toupper);
   
   string recordName;
   fileRecord record;
@@ -1081,8 +1096,8 @@ void Filesystem::addFile(int dataSector,string filename)
         {
           record.name[z] = bytes[z];
         }
-
-        cout << "im adding a file" << endl;
+		if(DEBUG)
+        	cout << "im adding a file" << endl;
         long offset = (dataSector * BPB_BytsPerSec) + i * 32 + 0;
         fseek(imageFile,offset,SEEK_SET);
         fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
@@ -1108,11 +1123,11 @@ void Filesystem::addFile(int dataSector,string filename)
       }
       for(iter = files.begin();iter!=files.end(); iter++)
       { 
-        cout << "omg" << endl;
         if((char)(*iter).name[0] =='.' && (char)(*iter).name[1] !='.' )
         {
-          cout << ".'s cluster location" << (*iter).fClusterLocation << endl;
-          cout << "current Cluster Location" << currentClusterLocation << endl;
+          
+          //cout << ".'s cluster location" << (*iter).fClusterLocation << endl;
+          //cout << "current Cluster Location" << currentClusterLocation << endl;
           if((*iter).fClusterLocation == currentClusterLocation)
           {
             files.insert(iter+2,record);
