@@ -87,7 +87,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	else if (userArgs[0].compare("open") == 0)
 	{
 	 	if (userArgs[2] == ""){
-			printf("%s\n", "wrong amount of arguments supplied");
+			printf("%s\n", "Wrong amount of arguments supplied");
 	 	}else{
 	 		fs->openFile(userArgs[1],userArgs[2]);
 	 	}
@@ -96,7 +96,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	else if (userArgs[0].compare("close") == 0)
 	{
 		if (userArgs[1] == ""){
-			printf("%s\n", "wrong amount of arguments supplied");
+			printf("%s\n", "Wrong amount of arguments supplied");
 		}else{
 			fs->closeFile(userArgs[1]);
 		}
@@ -105,7 +105,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	else if (userArgs[0].compare("create") == 0)
 	{
 		if (userArgs[1] == ""){
-			printf("%s\n", "wrong amount of arguments supplied");
+			printf("%s\n", "Wrong amount of arguments supplied");
 		}else{
 			
 		}
@@ -114,7 +114,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	else if (userArgs[0].compare("read") == 0)
 	{
 		if (userArgs[3] == ""){
-			printf("%s\n", "wrong amount of arguments supplied");
+			printf("%s\n", "Wrong amount of arguments supplied");
 		}
 		else
 		{
@@ -125,7 +125,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	else if (userArgs[0].compare("write") == 0)
 	{
 		if (userArgs[3] == ""){
-			printf("%s\n", "wrong amount of arguments supplied");
+			printf("%s\n", "Wrong amount of arguments supplied");
 		}else
 		{
 			fs->Write(userArgs[1],atoi(userArgs[2].c_str()),userArgs[3]);	
@@ -134,7 +134,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	else if (userArgs[0].compare("rm")== 0)
 	{
 		if (userArgs[1] == "")
-		printf("%s\n", "wrong amount of arguments supplied");
+		printf("%s\n", "Wrong amount of arguments supplied");
 		else
 		{
 			fs->removeFile(userArgs[1]);
@@ -143,7 +143,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	else if (userArgs[0].compare("cd") == 0)
 	{
 		if (userArgs[1] == ""){
-			printf("%s\n", "wrong amount of arguments supplied");
+			printf("%s\n", "Wrong amount of arguments supplied");
 		}else
 		{
 			fs->isChangeDirectory = true;
@@ -153,7 +153,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	else if (userArgs[0].compare("ls") == 0)
 	{
 		if (userArgs[1] == ""){
-			printf("%s\n", "wrong amount of arguments supplied");
+			printf("%s\n", "Wrong amount of arguments supplied");
 		}else{
 			// Lists out the directory NYI
 			fs->listDirectory(userArgs[1]);
@@ -162,7 +162,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	else if (userArgs[0].compare("mkdir") == 0)
 	{
 		if (userArgs[1] == ""){
-			printf("%s\n", "wrong amount of arguments supplied");
+			printf("%s\n", "Wrong amount of arguments supplied");
 		}else{
 			fs->makeDirectory(userArgs[1]);
 		}
@@ -170,7 +170,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	else if (userArgs[0].compare("rmdir") == 0)
 	{
 		if (userArgs[1] == ""){
-			printf("%s\n", "wrong amount of arguments supplied");
+			printf("%s\n", "Wrong amount of arguments supplied");
 		}else{
 			fs->removeDirectory(userArgs[1]);
 		}
@@ -179,7 +179,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	else if (userArgs[0].compare("size") == 0)
 	{
 		if (userArgs[1] == ""){
-			printf("%s\n", "wrong amount of arguments supplied");
+			printf("%s\n", "Wrong amount of arguments supplied");
 		}else
 		{
 			fs->entrySize(userArgs[1]);	
@@ -188,7 +188,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	else if (userArgs[0].compare("undelete") == 0)
 	{
 		if (userArgs[1] != ""){
-			printf("%s\n", "wrong amount of arguments supplied");
+			printf("%s\n", "Wrong amount of arguments supplied");
 		}else{
 			fs->Undelete();
 		}

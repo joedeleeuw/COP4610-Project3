@@ -522,7 +522,6 @@ void Filesystem::changeDirectory(string directoryName)
 	else
 	{
 		workingDirectory = previousWorkingDirectory;
-		//if(DEBUG)
 		cout << "Directory " << directoryName << " was not found" << endl;
 		return;
 	}
@@ -699,6 +698,7 @@ void Filesystem::closeFile(string file_name)
 	// Otherwise we remove it from the open file table
 	else{
 		fileTable.erase(files[currentFileIndex].unique);
+		cout << file_name << " is now closed" << endl;
 	}
 }
 
@@ -756,7 +756,8 @@ void Filesystem::removeDirectory(string directoryName){
 	// If directory found
 	 }else if(fileIndex != -1)
 	 {
-	 		cout << fileIndex << " file index" << endl;
+	 		if(DEBUG)
+	 			cout << fileIndex << " file index" << endl;
 	 		
 			string compare = "";
    			//compare = convertCharNameToString(fileIndex);
@@ -779,7 +780,8 @@ void Filesystem::removeDirectory(string directoryName){
 void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemove)
 {
 	fileRecord dirRecord;
-	cout << directoryDataSector << endl;
+	if(DEBUG)
+		cout << directoryDataSector << endl;
 	openImage();
 	
 	for(int i = 0; i < BPB_BytsPerSec/32; i++)
@@ -797,7 +799,8 @@ void Filesystem::readFilesystemforFile(int directoryDataSector,string filetoRemo
 				//fprintf(stderr,"inner counter index: %d\n", j);
 				//fprintf(stderr,"name byte value: %d, at index: %d ", nameByte,j); 	
 				dirRecord.name[j] = (char)parseInteger<uint8_t>(fdata + (directoryDataSector * BPB_BytsPerSec) + i * 32 + j);
-				fprintf(stdout,"%c", dirRecord.name[j]);
+				if(DEBUG)
+					fprintf(stdout,"%c", dirRecord.name[j]);
 				
 			}
 			for(int j = 0; j < 11; j++)
@@ -904,19 +907,19 @@ void Filesystem::Read(string file_name, unsigned int start_pos,int num_bytes)
 	
 	if(files[currentFileIndex].fileSize < start_pos)
 	{
-		cout << "start position is greater than file size" << endl;
+		cout << "Start position is greater than file size" << endl;
 		return;
 	}
 	//checks to see if the file exists in the open file table
 	if(fileTable.count(files[currentFileIndex].unique) == 0)
 	{
-		cout << "file " << file_name << "is not in the open file table" << endl;
+		cout << "File " << file_name << "is not in the open file table" << endl;
 		return;
 	}
 	//checks to see if file in open file table is open for writing not reading or rw
 	if(fileTable[files[currentFileIndex].unique] == 1)
 	{
-		cout << "file " << file_name << "is not open for reading" << endl;
+		cout << "File " << file_name << "is not open for reading" << endl;
 		return;
 	}
 	for(int j = 0; j < num_bytes; j++)
@@ -946,20 +949,20 @@ void Filesystem::Write(string file_name, unsigned int start_pos,string quoted_da
 
 	if(directoryExists(file_name,1) < 0)
 	{
-		cout << "file" << file_name << " is not a file" << endl;
+		cout << "File" << file_name << " is not a file" << endl;
 		return;
 	}
 	findDirectoriesForCluster(files[currentFileIndex].fClusterLocation,3);
 	
 	if(fileTable.count(files[currentFileIndex].unique) == 0)
 	{
-		cout << "file " << file_name << "is not in the open file table" << endl;
+		cout << "File " << file_name << "is not in the open file table" << endl;
 		return;
 	}
 	//checks to make sure that the file open for writing, if not, return
 	if(fileTable[files[currentFileIndex].unique] != 1)
 	{
-		cout << "file " << file_name << "is not open for writing" << endl;
+		cout << "File " << file_name << "is not open for writing" << endl;
 		return;
 	}
 	
