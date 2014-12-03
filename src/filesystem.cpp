@@ -292,8 +292,10 @@ bool Filesystem::getDirectoryClusterNumber(string directory)
 				if(directory == ".." && recordName == directory && readInProperDir){
 					if(files[lastFoundDotDotIValue].fClusterLocation == 0)
 					cout << "ls .. is currently disabled to the root directory" << endl;
+					else
 					findDirectoriesForCluster(files[lastFoundDotDotIValue].fClusterLocation, 0);
-					cout << "Record Name: " << recordName << "   " << "cluster number: " << files[lastFoundDotDotIValue].fClusterLocation << endl;
+					
+					//cout << "Record Name: " << recordName << "   " << "cluster number: " << files[lastFoundDotDotIValue].fClusterLocation << endl;
 					foundRecord = true;
 					break;
 				}
@@ -384,6 +386,9 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector, bool store)
 	Checks if the directory exists in the current working directory
 */
 bool Filesystem::directoryExistsAndChangeTo(string directoryName){
+	bool readInProperDir = false;
+	int lastFoundDotDotIValue = 0;
+	
 	// Uppercase user input for comparison
 	transform(directoryName.begin(), directoryName.end(), directoryName.begin(),::toupper);
 	/*
@@ -425,6 +430,13 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 		
 		cout << "recordName " << recordName << " directory Name " << directoryName << " entry type " << (int)files[i].attr << " x is " << x << " cluster loc " << files[i].fClusterLocation << endl; 
 		
+		if(currentClusterLocation == files[i].fClusterLocation){
+			readInProperDir = true;
+		}
+		if(directoryName == ".." && !readInProperDir){
+			lastFoundDotDotIValue = i;
+		}
+		
 		while(recordName == directoryName && (int)files[i].attr == 16 && x!=0)
 		{
 			cout << "hey i should do something " << endl;
@@ -437,16 +449,18 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 			}
 			else if(directoryName == "..")
 			{
+				cout << "hey im here files i " << files[i].fClusterLocation << " current cluster " << currentClusterLocation << endl;
+				cout << "last dot is " << lastFoundDotDotIValue << endl;
+				// CHANGE i to lastFoundDotDotIValue to be back to where was earlier!
 				if(files[i].fClusterLocation == 0)
 					{
 						
-						currentClusterLocation = 2;
+						currentClusterLocation = files[i].fClusterLocation;
 						workingDirectory = "root";
 						return true;
 					}
 				if(files[i].fClusterLocation == currentClusterLocation)
 					{
-						
 						currentClusterLocation = files[i].fClusterLocation;
 						//findDirectoriesForCluster(files[i].fClusterLocation,2);
 						return true;
