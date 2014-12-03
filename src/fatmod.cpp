@@ -143,6 +143,7 @@ char handleCommand(int argc,char *argv[], Filesystem* fs)
 	}
 	else if (userArgs[0].compare("cd") == 0)
 	{
+		
 		if (userArgs[1] == ""){
 			printf("%s\n", "Wrong amount of arguments supplied");
 		}else
