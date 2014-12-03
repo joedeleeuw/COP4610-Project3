@@ -212,13 +212,13 @@ Call function to read from data sector in this function.
 
 void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 {
-	//fprintf(stderr,"Cluster index %x\n", clusterIndex);
+	
 	//EOC chain is 268435455
 	dataSector = 0;
 	uint32_t nextCluster;
 	while(clusterIndex  != 268435455)
 	{
-		
+		cout << "segfault check line 221" << endl;
 		FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
 		dataSector = findFirstSectorOfCluster(clusterIndex);
 		// Gets the FATEntry for the location of the next directory cluster
@@ -249,10 +249,13 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 bool Filesystem::getDirectoryClusterNumber(string directory)
 {
 	string recordName;
-	bool foundRecord = false;
-				
+	bool foundRecord = false, readInProperDir = false;
+	int lastFoundDotDotIValue = 0;
+	
 	for(unsigned int i = 0; i < files.size(); i++)
 		{
+			cout << "current cluster loc " << currentClusterLocation << endl;
+			
 			// If direcory
 			if((int)files[i].attr == 16 )
 			{
@@ -265,6 +268,10 @@ bool Filesystem::getDirectoryClusterNumber(string directory)
 					if(readInChar != ' ')
 						recordName.push_back(readInChar);
 				}	
+				recordName.erase(remove(recordName.begin(), recordName.end(), '\0'), recordName.end());
+				directory.erase(remove(directory.begin(), directory.end(), '\0'), directory.end());
+				
+				cout << "Record Name: " << recordName << "   " << "cluster number: " << files[i].fClusterLocation << " attribute " << (int)files[i].attr << endl;
 				
 				// Trims and converts to uppercase the record and directoryname
 				recordName = normalizeToUppercase(recordName, ' ');
@@ -272,16 +279,27 @@ bool Filesystem::getDirectoryClusterNumber(string directory)
 					cout << "dot stuff" << endl;*/
 				directory = normalizeToUppercase(directory, ' ');
 				
-				// For now we make any use of .. go to 2 (root cluster)
-				if(directory == ".."){
-					//findDirectoriesForCluster(2, 0);
-					cout << "ls .. is currently disabled" << endl;
-					
+				if(currentClusterLocation == files[i].fClusterLocation){
+					readInProperDir = true;
+				}
+				
+				if(directory == ".." && !readInProperDir){
+					lastFoundDotDotIValue = i;
+				}
+				
+				// For now we make any use of .. 
+				// seems like each cluster number is unique so we can use that to know where to go
+				if(directory == ".." && recordName == directory && readInProperDir){
+					if(files[lastFoundDotDotIValue].fClusterLocation == 0)
+					cout << "ls .. is currently disabled to the root directory" << endl;
+					findDirectoriesForCluster(files[lastFoundDotDotIValue].fClusterLocation, 0);
+					cout << "Record Name: " << recordName << "   " << "cluster number: " << files[lastFoundDotDotIValue].fClusterLocation << endl;
 					foundRecord = true;
 					break;
 				}
-				else if(recordName == directory)
+				else if(recordName == directory && directory != "..")
 				{
+					cout << "hit 21" << endl;
 					findDirectoriesForCluster(files[i].fClusterLocation, 0);
 					foundRecord = true;
 					break;
@@ -405,11 +423,12 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 		recordName.erase(remove(recordName.begin(), recordName.end(), '\0'), recordName.end());
 		directoryName.erase(remove(directoryName.begin(), directoryName.end(), '\0'), directoryName.end());
 		
-		cout << "recordName " << recordName << " directory Name " << directoryName << " entry type " << (int)files[i].attr << " x is " << x << endl; 
+		cout << "recordName " << recordName << " directory Name " << directoryName << " entry type " << (int)files[i].attr << " x is " << x << " cluster loc " << files[i].fClusterLocation << endl; 
 		
 		while(recordName == directoryName && (int)files[i].attr == 16 && x!=0)
 		{
 			cout << "hey i should do something " << endl;
+			
 			//cout <<"currentClusterLocation" <<currentClusterLocation << endl;
 			if(directoryName == ".")
 			{
@@ -433,7 +452,7 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 						return true;
 					}
 				
-				}
+			}
 			x--;
 			string filename = convertCharNameToString(x,11);
 			filename = normalizeToUppercase(filename, ' ');
@@ -451,6 +470,7 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 					fprintf(stderr,"%d\n",(int)files[i].fClusterLocation);
 					cout << "hit 3" << endl;
 					findDirectoriesForCluster(files[i].fClusterLocation,2);
+					currentClusterLocation = files[i].fClusterLocation; // Updates cluster number for most cases
 					return true;
 				}
 			}
@@ -868,8 +888,8 @@ void Filesystem::displayVectorContents()
 		{
 			cout << files[i].name[j];
 		}
-		cout << endl;
-		cout << files[i].fClusterLocation << endl;
+		cout << " " << files[i].fClusterLocation << endl;
+		
 	}
 }
 
@@ -1197,7 +1217,7 @@ void Filesystem::createDirectory(string directoryName)
 {
 	 
 	nextDirectorycluster = findEmptyFAT();
-	findDirectoriesForCluster(currentClusterLocation,3);
+	findDirectoriesForCluster(currentClusterLocation,0);
  	addFile(dataSector,directoryName,true);
  	
  	//add . and .. entried in the cluster number of the new directory
@@ -1208,6 +1228,7 @@ void Filesystem::createDirectory(string directoryName)
 
 int Filesystem::findEmptyFAT()
 {
+	openImage();
 	cout << "test" << endl;
 	FatEntry entry;
 	int x = 2;
@@ -1218,8 +1239,15 @@ int Filesystem::findEmptyFAT()
 		nextCluster = parseInteger<uint32_t>(fdata + entry.FATOffset + entry.FATsecNum * BPB_BytsPerSec);
 		x++;
 	}
+	uint32_t bytes = 0x0FFFFFFF;
+	entry = findFatEntry(x-1);
+	long offset = (entry.FATOffset + entry.FATsecNum * BPB_BytsPerSec);
+	fseek(imageFile,offset,SEEK_SET);
+	fwrite(&bytes,sizeof(uint8_t),sizeof(&bytes),imageFile);
+	closeImage();
 	return x-1;
 }
+
 
 
 void Filesystem::makeDirectory(string directoryName){

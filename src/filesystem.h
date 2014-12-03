@@ -89,6 +89,7 @@ public:
 	void Undelete();
 	int findEmptyFAT();
 	void createDirectory(string);
+	void setEoc();
 //private:
 
 	/* The cluster number of the first cluster of the root directory.*/
