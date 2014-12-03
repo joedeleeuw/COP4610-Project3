@@ -1,0 +1,658 @@
+commit 80b037ff0bc78b70cead30699fe7605634cb4bc1
+Author: Justin Block <jusblock@gmail.com>
+Date:   Fri Nov 28 23:12:52 2014 -0500
+
+    Ready for submission disables ls ..
+
+commit 6be95c024567a86bb9a0f308605a6b3be82dade6
+Author: Justin Block <jusblock@gmail.com>
+Date:   Fri Nov 28 22:19:22 2014 -0500
+
+    Adds create etc.
+
+commit b0c27e6f40df9903194ef4a38979e2903f67c87e
+Author: Justin Block <jusblock@gmail.com>
+Date:   Fri Nov 28 21:53:58 2014 -0500
+
+    Adds output fixes
+
+commit cbad3ce4faea1dba1c444e8a419c16e0de7797b7
+Author: Justin Block <jusblock@gmail.com>
+Date:   Fri Nov 28 05:21:35 2014 -0500
+
+    Fixes some output issues, fixes debug flags, adds checks for / as per the writeup
+
+commit e05633c04e652477182e34a342b2c4cc19477924
+Author: Justin Block <jusblock@gmail.com>
+Date:   Thu Nov 27 05:06:41 2014 -0500
+
+    Fixes small warning on compilation
+
+commit 2f9ceb7cb7fb79e5831ede625cdb43123563cf2c
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Tue Nov 25 15:45:05 2014 -0500
+
+    implemented write, fixed read, added error checking for both, started undelete implementation
+
+commit 27dbf73e01ce990f255e8ec793c8c04b7bf56b3f
+Author: Justin Block <jusblock@gmail.com>
+Date:   Tue Nov 25 02:46:39 2014 -0500
+
+    Adds beginnings of report and some notes of what must be done before submission
+
+commit 416c6258f81b59182b4c8fdbdc9b5734f0e96e0c
+Author: Justin Block <jusblock@gmail.com>
+Date:   Tue Nov 25 02:25:40 2014 -0500
+
+    Adds complete read command
+
+commit b03b263b83d3fe4b162501bc7461241d9768eb8c
+Author: Justin Block <jusblock@gmail.com>
+Date:   Tue Nov 25 02:21:58 2014 -0500
+
+    Adds some of read
+
+commit 51c34c8b681d4b15a88462c60a8308968e24804b
+Author: Justin Block <jusblock@gmail.com>
+Date:   Tue Nov 25 01:27:09 2014 -0500
+
+    Adds working rmdir
+
+commit fefe6ae6220fa956b63373ddb63eaf8c7ad33a2f
+Author: Justin Block <jusblock@gmail.com>
+Date:   Tue Nov 25 00:26:39 2014 -0500
+
+    Fixes stuff
+
+commit a3adc85c52205a1a8508e73b030f64a9a9710e54
+Author: Justin Block <jusblock@gmail.com>
+Date:   Mon Nov 24 22:47:13 2014 -0500
+
+    Fixes small bug with open/close
+
+commit 5f3b1732e23c8401343b07902bc0f1a7c819f180
+Author: Justin Block <jusblock@gmail.com>
+Date:   Mon Nov 24 22:00:22 2014 -0500
+
+    Adds close command
+
+commit b4abef1ac36700f3ed992ac68613e2863d2ee058
+Author: Justin Block <jusblock@gmail.com>
+Date:   Mon Nov 24 21:52:13 2014 -0500
+
+    Adds open command
+
+commit 68440fcdcb9ee4b528cda73754faa5e1b860c329
+Author: Justin Block <jusblock@gmail.com>
+Date:   Mon Nov 24 21:45:31 2014 -0500
+
+    fixes remove command
+
+commit a60d081fe5383ac68d86b1c40c5846d4c06467e2
+Author: Justin Block <jusblock@gmail.com>
+Date:   Mon Nov 24 20:57:23 2014 -0500
+
+    Adds some fixes for cd, ls
+
+commit e9646fbc8e547f49c60b2e51f23dd3090e092604
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Mon Nov 24 19:25:15 2014 -0500
+
+    yeah yeah yeah
+
+commit dc7fbd284bfe97780d2f95dfeec8e4e6c3bbf5bb
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Mon Nov 24 01:07:48 2014 -0500
+
+    fixed cd for the most part, ls seems fine, gotta clean up directoryExists
+
+commit 0321851c63faa21e81599e093b11c73461a9ad62
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sun Nov 23 18:54:49 2014 -0500
+
+    Fixes cd command again
+
+commit 4c615bfaca5da0c052a8f4d5bd901dedd817bb23
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sun Nov 23 17:41:00 2014 -0500
+
+    Commit before we rip out the vector
+
+commit 940300f8af48f16af3e64201e298c00b5b6641be
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sun Nov 23 16:57:23 2014 -0500
+
+    Adds some misc unworking stuff
+
+commit 68bb0156cb37efdcf055629cb0fb606c0895820d
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sun Nov 23 16:11:10 2014 -0500
+
+    At position where things might break even more
+
+commit ee3c2edcc57f8cc175c59edde487741d872142fc
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sat Nov 22 18:00:48 2014 -0500
+
+    Adds some notes and outline for remove director
+
+commit 4b95f078215f4ec2e896cb919decdd254d32ebac
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sat Nov 22 16:56:24 2014 -0500
+
+    Fixes cd command
+
+commit 519517c74d8002852116768229e3fb72429dcc94
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sat Nov 22 06:50:05 2014 -0500
+
+    Adds some todo notes for known bug in cd
+
+commit 24f75141967a272bbcb41085c200c2f2e7c2f35c
+Author: Justin Block <jusblock@gmail.com>
+Date:   Fri Nov 21 16:18:18 2014 -0500
+
+    Begins adding mkdir and abstracts checking if a directory exists
+
+commit aba099ea1bbefee10a10ca435cb13a3e89f22522
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Thu Nov 20 22:25:33 2014 -0500
+
+    can now cd and ls all the way through directories, need a way to keep state though, so you cant ls RED from all the way into GREEN for example
+
+commit bd6a5c020c60f7bbd22ff8f200fb7ecf0d00b55a
+Author: Justin Block <jusblock@gmail.com>
+Date:   Thu Nov 20 19:43:27 2014 -0500
+
+    Fixes bug with getting the directory using ls
+
+commit 1086c50e2f75006c0ea6eb2f5390d6e36262445d
+Author: Justin Block <jusblock@gmail.com>
+Date:   Thu Nov 20 19:32:24 2014 -0500
+
+    Fixes issue where we couldnt use file.h since it was not in makefile
+
+commit 113fc067839b36f0b69a51131984dd16c96092c8
+Author: Justin Block <jusblock@gmail.com>
+Date:   Thu Nov 20 19:24:26 2014 -0500
+
+    Abstracts the conversion of records and directory names
+
+commit 6d6678120ca20b11bc2f1c54d3de79336ec9ce89
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Thu Nov 20 18:19:39 2014 -0500
+
+    added some ls functionality and abstracted cluster and directory iteration
+
+commit 0900415e68c09dd29c5626377e4b28c1dc22a0ea
+Author: Justin Block <jusblock@gmail.com>
+Date:   Wed Nov 19 21:12:43 2014 -0500
+
+    Adds a note about changing directories
+
+commit ca5a581dd707e538e2841c907d8145778a343606
+Author: Justin Block <jusblock@gmail.com>
+Date:   Wed Nov 19 21:07:47 2014 -0500
+
+    Fixes issue with fatspec.pdf not fully being read in
+
+commit eff634fd981060d1ad5cb78008007c30890108ea
+Author: Justin Block <jusblock@gmail.com>
+Date:   Wed Nov 19 20:45:01 2014 -0500
+
+    Removes periods from directory name passed in on change directory
+
+commit 1ec350a84acaf8ab78be324f4e240849420155bf
+Author: Justin Block <jusblock@gmail.com>
+Date:   Wed Nov 19 20:38:33 2014 -0500
+
+    Starts adding checking if a directory exists
+
+commit 5ebc0725b6c1717600862dfee72e6a482ee88057
+Merge: ea5f3e1 800959d
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 19 15:36:05 2014 -0500
+
+    Merge branch 'master' of https://github.com/jad11v/COP4610-Project3
+    bleh
+
+commit ea5f3e1dd4659af59d4f66ea87e38d6dc9b73c50
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 19 15:34:55 2014 -0500
+
+    added call to change directory in main, as well as some funky change directory code
+
+commit 800959d79ad3c9179a30fe5f518206b94dabcde4
+Author: Justin Block <jusblock@gmail.com>
+Date:   Wed Nov 19 12:59:59 2014 -0500
+
+    Fixes corrupt fat image
+
+commit 947735c889f94fb3a8ed19038892ef70babee256
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 19 12:39:05 2014 -0500
+
+    files
+
+commit 2dd4272045b31b1a4e55790a5a44191e16ec13f7
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 19 12:35:08 2014 -0500
+
+    merge conflict
+
+commit 0dc79807c90e1a2b3f05c2a84a933d68e1d41785
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 19 00:42:35 2014 -0500
+
+    Found and read in the second cluster for the Root directory of the image, corrected the outer loop to go through attributes, modularized record access. Corrected previous misuse of record attribute offsets
+
+commit 18768c2f83def460125198106549a9b5a71d1372
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Tue Nov 18 21:00:23 2014 -0500
+
+    found second and last cluster for root directory
+
+commit 84a2b43b983dbfe440c14915d584459257554180
+Merge: 25b9436 057710c
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Tue Nov 18 19:33:12 2014 -0500
+
+    Merge branch 'master' of https://github.com/jad11v/COP4610-Project3
+    update from c9
+
+commit 057710cc2175fe381df34dc0ec9cc2416ad20fc7
+Author: Justin Block <jusblock@gmail.com>
+Date:   Tue Nov 18 18:46:17 2014 -0500
+
+    Adds object of type File in filesystem.h
+
+commit 105cdd87cf86769b4d7d9a94099deeaffe2bcade
+Author: Justin Block <jusblock@gmail.com>
+Date:   Tue Nov 18 17:49:41 2014 -0500
+
+    Fixed ordering of everything, filesystem CANNOT contain functions that the other classes call to, it can only call
+
+commit 25b9436eb858594500df9f7d640e64a63f6bdac2
+Merge: df89522 f7846fc
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Tue Nov 18 12:14:53 2014 -0500
+
+    merge
+
+commit df89522671304e806d6d508b531bda1d6b85fbd0
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Tue Nov 18 12:12:07 2014 -0500
+
+    merge
+
+commit f7846fcd05094f6a936762951d5826bc784c4cdd
+Author: Justin Block <jusblock@gmail.com>
+Date:   Mon Nov 17 23:16:31 2014 -0500
+
+    Temporarily disables file.h needs to be fixed
+
+commit 7ab5b95ec8e00cfda89c3112cc9c1ffee1339fa8
+Author: Justin Block <jusblock@gmail.com>
+Date:   Mon Nov 17 23:06:49 2014 -0500
+
+    Starts adding file reading
+
+commit b56390ba61789242cce8b5c382742cf1f318bf5a
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Mon Nov 17 21:13:26 2014 -0500
+
+    prettifyed the output
+
+commit 1dff7b9d7904b01965459323ec4bc5ed68ae9411
+Merge: 1f38533 eb9e783
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Mon Nov 17 20:52:28 2014 -0500
+
+    merge
+
+commit eb9e7833941a732a08775462982383e68f9bf22d
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Mon Nov 17 16:14:17 2014 -0500
+
+    better implementation of findRootDirectory, now just need to do some binary maths to get the next cluster Number
+
+commit 9caeed4dcb2d086f3a322984009833fbf3084547
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Mon Nov 17 00:24:25 2014 -0500
+
+    handing next cluster data location
+
+commit f1afc87bfd454bccc573263d0b770473c0620b24
+Merge: 3898d64 3832429
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Sat Nov 15 17:27:26 2014 -0500
+
+    merge
+
+commit 38324297b52e17d730080da8268d05e6d6e5aa57
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sat Nov 15 16:57:56 2014 -0500
+
+    Adds check for long file names
+
+commit 432f23bbbbbd685326690fbc3f6b739d7f863bc0
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sat Nov 15 14:39:54 2014 -0500
+
+    Adds check for unused, eod not yet done
+
+commit 3898d641715a96d2ec1b437d6084e490bd52210a
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Sat Nov 15 14:08:53 2014 -0500
+
+    update
+
+commit 1f385337bab7c40b649b90a8000ef2e55fc74a66
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Fri Nov 14 17:20:19 2014 -0500
+
+    third conflict
+
+commit 82cd212bce11ecc653d8cfc8a44a9682cbbf894d
+Merge: c94e668 61acb4f
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Fri Nov 14 11:11:00 2014 -0500
+
+    Merge branch 'master' of https://github.com/jad11v/COP4610-Project3
+    fixing merge conflict
+
+commit c94e668ae218f978847993c30f577e4d9501b4b6
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Fri Nov 14 11:10:25 2014 -0500
+
+    fixing merge conflicts
+
+commit 61acb4f266b01be49cdeeaa278179894dd9f96aa
+Author: Justin Block <jusblock@gmail.com>
+Date:   Fri Nov 14 10:37:47 2014 -0500
+
+    Gets the file size dynamically for len as we cant expect fat32.img to be used all the time
+
+commit cca606e88ab246e0dd872f30c07c09167885465b
+Author: Justin Block <jusblock@gmail.com>
+Date:   Thu Nov 13 21:15:47 2014 -0500
+
+    Moves where going through roo dir is
+
+commit fb2f5c97fbd35526ca09eb72b3701eb908ad4561
+Author: Justin Block <jusblock@gmail.com>
+Date:   Thu Nov 13 21:12:36 2014 -0500
+
+    Adds reading through files
+
+commit 6032544331a4865a88feaf98f063fab5f433d6dc
+Author: Justin Block <jusblock@gmail.com>
+Date:   Thu Nov 13 20:31:17 2014 -0500
+
+    Starts adding funcion to get root dir
+
+commit e605ec105d81871c119458dc04e7d0d3ff746a76
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Thu Nov 13 19:47:56 2014 -0500
+
+    abstraction because it makes us feel safe
+
+commit f019dc43ebed3bdd13d4c337929b8527cd00c757
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Thu Nov 13 12:32:58 2014 -0500
+
+    added required prompt for user(hard coded)
+
+commit 35a9d31871818548cc0da45b7dbc27f133730a8d
+Merge: 5bf4336 bd85ba6
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 12 23:19:24 2014 -0500
+
+    Merge branch 'master' of https://github.com/jad11v/COP4610-Project3
+    fixing merge confict
+
+commit 5bf4336162a641360b9551549e4889a84d227455
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 12 23:18:17 2014 -0500
+
+    merge confict
+
+commit bd85ba67902efeda234515dfe431885a94d1a0ea
+Author: Justin Block <jusblock@gmail.com>
+Date:   Wed Nov 12 22:01:42 2014 -0500
+
+    Adds example usage for FatEntry
+
+commit 23f6c2564b2b8635ad419a13385cd1310f2417b7
+Author: Justin Block <jusblock@gmail.com>
+Date:   Wed Nov 12 21:45:54 2014 -0500
+
+    Misc stuff
+
+commit 217fc3c2a2b94b2c1035d6c3525f0f993cbe9784
+Author: Justin Block <jusblock@gmail.com>
+Date:   Wed Nov 12 21:31:10 2014 -0500
+
+    Adds some information on which tables from FAT documentation we need
+
+commit 1e2d599d44db62c35646398cd0c4722a53897564
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 12 19:55:53 2014 -0500
+
+    added function to check FAT
+
+commit 50d3f6864052858cc4bc9d75434373316d1e0afc
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 12 17:11:50 2014 -0500
+
+    Delete fmod
+
+commit e16921b68e90390e3dfdc5999a1cc6243eca1a4a
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 12 17:11:39 2014 -0500
+
+    Delete fatdirectory.h
+
+commit 8047163323e9ff766c2fad7897d6c9aa8e2d5838
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 12 17:11:19 2014 -0500
+
+    Delete fatdirectory.cpp
+
+commit d9d5d250b65fddfb7dddc524a62ed472f83deae0
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 12 17:11:13 2014 -0500
+
+    Delete biosblock.h
+
+commit 0bb70e0c693c4cef502c7f1b035f90a7525a5c6e
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 12 17:10:58 2014 -0500
+
+    Delete biosblock.cpp
+
+commit 81ba63c18bbf9ee913f2114a747aa6644d51233f
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 12 17:10:11 2014 -0500
+
+    cleaned stuff up because i got confused
+
+commit a2b4aa9a86b22d4b883a7b040e59c43053599bdd
+Author: Justin Block <jusblock@gmail.com>
+Date:   Tue Nov 11 22:32:17 2014 -0500
+
+    Just changes make to compile program as fmod as per writeup
+
+commit 66b5abef603553cbc2c4cbc83f29a3025a0d2171
+Author: Justin Block <jusblock@gmail.com>
+Date:   Tue Nov 11 22:07:49 2014 -0500
+
+    Adds reference point for bios block, needs to be refactored/changed
+
+commit 856603e7592e7ea48c7a13aac304ab1b9c7f63f9
+Author: Justin Block <jusblock@gmail.com>
+Date:   Tue Nov 11 13:02:35 2014 -0500
+
+    Just adding blank file we will need and headers
+
+commit cc21c3a8c8a2433ce5e03fe1d0036f9181458838
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Mon Nov 10 10:27:41 2014 -0500
+
+    fixed call to openFile
+
+commit 625ea2875820007de5b42420b6ac143a3a3cad23
+Merge: 625d3ff de036a9
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Mon Nov 10 10:18:46 2014 -0500
+
+    Merge branch 'master' of https://github.com/jad11v/COP4610-Project3
+
+commit 625d3ff6023200f694f3afb68c5e2bd804c60b2a
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Mon Nov 10 10:17:08 2014 -0500
+
+    Added template for file class, as well as declaration and initial implementation of map for open file table.
+
+commit de036a916a7a52cfcc44f42c8ff739e88d797700
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sat Nov 8 18:54:56 2014 -0500
+
+    Begins adding list directory command, taking break for bit of the day
+
+commit 8c3c69b2db9380ae618f5b630cf3f06b368a961f
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sat Nov 8 14:10:36 2014 -0500
+
+    Fixes minor logic on command checking and adds undelete paramaeter check
+
+commit 52bbf516d386c7c744c0e2972c53626057429c25
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sat Nov 8 13:25:48 2014 -0500
+
+    Removes all warnings when compiling
+
+commit f2efa643731e4d8c107691cecb1a4459ceecfe33
+Author: Justin Block <jusblock@gmail.com>
+Date:   Sat Nov 8 13:18:48 2014 -0500
+
+    Fixes an error in command entry and adds fat32 img
+
+commit 0f71d5a683b266bfe9960b486dc4ab0fb28bcef5
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Fri Nov 7 14:57:43 2014 -0500
+
+    add calculated values of root cluster sector and first data sector, as well as begining of file open implementation
+
+commit ad47c878c5c64dc5058a5ad3a759ddf877fee6b7
+Merge: 284316c bc5dcb3
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Fri Nov 7 10:31:22 2014 -0500
+
+    Merge branch 'master' of https://github.com/jad11v/COP4610-Project3
+    
+    Conflicts:
+    	src/Filesystem.h
+    	src/filesystem.cpp
+
+commit 284316c235352312c6f62e5cb46d785953a1975b
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Fri Nov 7 10:15:42 2014 -0500
+
+    merge conflict
+
+commit 1c19d6819c204d1634d7cae4c73ed473a1379ca6
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Fri Nov 7 10:11:24 2014 -0500
+
+    pushed from wrong location, should be good now
+
+commit bc5dcb30eb2b15f3090ee1b38e8ee0c2fe979544
+Author: Justin Block <jusblock@gmail.com>
+Date:   Fri Nov 7 01:35:02 2014 -0500
+
+    Fixes issue with filesystem name, cleans up some formatting. Known issue - making causes problem with template (been existing since last commit)
+
+commit 15a808de382c730a13fd1edfa3e6fbbf0b26da56
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Thu Nov 6 11:57:00 2014 -0500
+
+    fixed some syntax
+
+commit 17abe853edb243d573e605645cd4248dae822fdb
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 5 20:17:36 2014 -0500
+
+    stored fsinfo data from fat image
+
+commit 8affe0a000ba3b0c2a679a992cf6e9490e54723f
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 5 16:38:08 2014 -0500
+
+    opened file correctly, implemented parse integer function
+
+commit 1428b1d7422ef35e5f6a4d5fde1d1fc727fbcd13
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 5 14:18:59 2014 -0500
+
+    fixed user prompt and handling
+
+commit 9cc41bbc59e9ece57ffdd9475f5969facce22878
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 5 14:12:15 2014 -0500
+
+    fixed user input, makefile
+
+commit 6b4ff80bd0e917982daf468af83fbcc3e458bc5d
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Wed Nov 5 10:31:02 2014 -0500
+
+    isolated source from misc stuff
+
+commit 758a04a1fe64581196907750218c7bd18b682eaa
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Tue Nov 4 09:58:07 2014 -0500
+
+    added Makefile, more input handling
+
+commit 3c971dabf1c399fa7eb1891302a23db464c17951
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Tue Nov 4 01:07:38 2014 -0500
+
+    abstracted user commands and initialized Filesystem
+
+commit f25c469a26e8f78f0fd6f1ac636691d28b683bff
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Tue Nov 4 00:41:29 2014 -0500
+
+    stringstream and error stuff
+
+commit 1cb70aa452c5b219dbc9a6221d7509ee3ab50c0b
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Tue Nov 4 00:16:24 2014 -0500
+
+    checking for command type stuff
+
+commit b9e8a326cf4efead0725128789510d160de3837f
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Mon Nov 3 22:45:36 2014 -0500
+
+    structs to hold some ints and char bytes from the filesystem
+
+commit 0806b65e5b1661523bd63741636f5d0d81538b46
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Mon Nov 3 22:40:30 2014 -0500
+
+    woo more boiler plate
+
+commit 165ffb5e8f47d19f771f15be4e951fff54983069
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Mon Nov 3 22:02:18 2014 -0500
+
+    initial commit
+
+commit a2e889f6beda6e79799953e08e0427fd84a34967
+Author: Joe Deleeuw <jdeleeuw@fsu.edu>
+Date:   Tue Oct 28 16:58:53 2014 -0400
+
+    Initial commit

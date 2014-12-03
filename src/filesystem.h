@@ -57,6 +57,7 @@ public:
 	void openFile(string, string);
 	void closeFile(string);
 	void createFile(string);
+	void addFile(int,string,bool);
 	void readfromFile(string,unsigned int, unsigned int);
 	void writetoFile(string, unsigned int, string);
 	void removeFile(string);
@@ -86,7 +87,8 @@ public:
 	void Read(string,unsigned int,int);
 	void Write(string,unsigned int,string);
 	void Undelete();
-	void addFile(int,string);
+	int findEmptyFAT();
+	void createDirectory(string);
 //private:
 
 	/* The cluster number of the first cluster of the root directory.*/
@@ -141,6 +143,7 @@ public:
 	vector<fileRecord> files;
 	vector<fileRecord> currentDir;
 	map<int, int> fileTable;
+	int nextDirectorycluster;
 };
 
 #endif

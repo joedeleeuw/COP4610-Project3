@@ -273,6 +273,7 @@ bool Filesystem::getDirectoryClusterNumber(string directory)
 				// For now we make any use of .. go to 2 (root cluster)
 				if(directory == ".."){
 					//findDirectoriesForCluster(2, 0);
+					//findDirectoriesForCluster(files[i].fClusterLocation, 0);
 					cout << "ls .. is currently disabled" << endl;
 					foundRecord = true;
 					break;
@@ -491,24 +492,6 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 return false;
 }
 
-/*
-    Creates a directory with the passed in directoryName,
-    also checks if the directory already exists in the current
-    working directory
-    
-    A
-    NYI
-*/
-void Filesystem::makeDirectory(string directoryName){
-    // Check if the directory already exists
-    if(directoryExists(directoryName) == -1){
-    	cout << "The directory " << directoryName << " already exists." << endl;
-    }
-    // Otherwise we create the directory
-    else{
-    	
-    }
-}
 
 /*
 	Changes the directory and checks if it exists.
@@ -735,7 +718,7 @@ void Filesystem::removeFile(string file)
 			files[currentFileIndex].name[0] = 229;
 		string hack = "#" + file;
 		
-		addFile(2050,hack);
+		addFile(2050,hack,false);
 }
     // Otherwise we didnt find the directory
     else
@@ -1056,11 +1039,11 @@ void Filesystem::createFile(string filename)
   if(DEBUG)
   	cout << "current cluster location" << currentClusterLocation << endl;
  findDirectoriesForCluster(currentClusterLocation,3);
- addFile(dataSector,filename);
+ addFile(dataSector,filename,false);
 
 }
 
-void Filesystem::addFile(int dataSector,string filename)
+void Filesystem::addFile(int dataSector,string filename,bool dir)
 {
   vector<fileRecord>::iterator iter;
   openImage();
@@ -1073,7 +1056,7 @@ void Filesystem::addFile(int dataSector,string filename)
   fileRecord record;
   if(filename.size() != 11)
     filename.resize(11);
-  uint8_t *bytes = new uint8_t[filename.size()+1];
+  uint8_t *bytes = new uint8_t[filename.size()];
   bytes[filename.size()]=0;
   memcpy(bytes,filename.c_str(),filename.size());
   
@@ -1106,21 +1089,48 @@ void Filesystem::addFile(int dataSector,string filename)
         {
           if( j == 11)
             {
-              uint8_t bytes[] = {0x20};
+             uint8_t byte[] = {0x00};
+				if(!dir)
+              uint8_t byte[] = {0x20};
+              else
+              {
+              uint8_t byte[] = {0x10};	
+              }
+              //cout <<"value " << byte << endl;
               offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
               fseek(imageFile,offset,SEEK_SET);
-              fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
+              fwrite(byte,sizeof(uint8_t),sizeof(byte),imageFile);
           }
+          if(j == 20 && dir)
+          {
+          	uint16_t lowbytes = (uint32_t)nextDirectorycluster & 0xFFFF;
+          	//uint16_t lowbytes[] = {(uint32_t)nextDirectorycluster & 0xFFFF};
+          	offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
+          	fseek(imageFile,offset,SEEK_SET);
+          	fwrite(&lowbytes,sizeof(uint16_t),sizeof(lowbytes),imageFile);
+          	fprintf(stdout, "%d", lowbytes);
+          	
+          }
+        if(j == 26 && dir)
+        {
+        	uint16_t highbytes = (uint32_t)nextDirectorycluster >> 16;
+          	offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
+          	fseek(imageFile,offset,SEEK_SET);
+          	fwrite(&highbytes,sizeof(uint16_t),sizeof(highbytes),imageFile);
+          	cout << "high word" << highbytes << endl;
+        }
+        
         if(j == 28)
         {
-          int8_t bytes[] = {0x0,0x0,0x0,0x0};
+          uint8_t bytes[] = {0x0,0x0,0x0,0x0};
           offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
           fseek(imageFile,offset,SEEK_SET);
           fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
         }
         record.fileSize = 0;
-        record.attr = 32;
-      }
+        if(!dir)record.attr = 32;
+      	if(dir)record.attr = 16;
+        }
       for(iter = files.begin();iter!=files.end(); iter++)
       { 
         if((char)(*iter).name[0] =='.' && (char)(*iter).name[1] !='.' )
@@ -1151,10 +1161,49 @@ void Filesystem::addFile(int dataSector,string filename)
   closeImage();
 }
 
-
+/*find the first entry in the fat that is zero, the index of that fat entry is the cluster number where
+the data exist should exist for that cluster. point that cluster to the end of the cluster chain.*/
 void Filesystem::Undelete()
 {
 
+	
+	
+}
+
+void Filesystem::createDirectory(string directoryName)
+{
+	 
+	nextDirectorycluster = findEmptyFAT();	
+	addFile(currentClusterLocation,directoryName,true);
+	
+}
+
+int Filesystem::findEmptyFAT()
+{
+	cout << "test" << endl;
+	FatEntry entry;
+	int x = 2;
+	int nextCluster = -1;
+	while(nextCluster != 0 )
+	{
+		entry = findFatEntry(x);
+		nextCluster = parseInteger<uint32_t>(fdata + entry.FATOffset + entry.FATsecNum * BPB_BytsPerSec);
+		x++;
+	}
+	return x-1;
+}
 
 
+void Filesystem::makeDirectory(string directoryName){
+    // Check if the directory already exists
+    if(directoryExists(directoryName) != -1)
+    {
+    	cout << "The directory " << directoryName << " already exists." << endl;
+    	
+    }
+    // Otherwise we create the directory
+    else
+    {
+     	createDirectory(directoryName);
+    }
 }
