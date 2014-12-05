@@ -215,9 +215,8 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 	//EOC chain is 268435455
 	dataSector = 0;
 	uint32_t nextCluster;
-	while(clusterIndex  != 268435455)
+	while(clusterIndex  != 268435455 && clusterIndex != 268435448)
 	{
-		cerr << "Cluster Index" << clusterIndex << endl;
 		FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
 		dataSector = findFirstSectorOfCluster(clusterIndex);
 		// Gets the FATEntry for the location of the next directory cluster
@@ -278,7 +277,12 @@ bool Filesystem::getDirectoryClusterNumber(string directory)
 					foundDot = true;
 				}
 				else if(directory == ".." && foundDot){
-					findDirectoriesForCluster(2, 0);
+					if(files[i].fClusterLocation == 0){
+						findDirectoriesForCluster(2, 0);
+					}else{
+						findDirectoriesForCluster(files[i].fClusterLocation, 0);
+					}
+					
 					foundRecord = true;
 					break;
 				}
