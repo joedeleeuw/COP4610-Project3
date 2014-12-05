@@ -212,13 +212,12 @@ Call function to read from data sector in this function.
 
 void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 {
-	
 	//EOC chain is 268435455
 	dataSector = 0;
 	uint32_t nextCluster;
 	while(clusterIndex  != 268435455)
 	{
-		cout << "segfault check line 221" << endl;
+		cerr << "Cluster Index" << clusterIndex << endl;
 		FirstDataSector = BPB_ResvdSecCnt + (BPB_NuMFATs * BPB_FATz32);
 		dataSector = findFirstSectorOfCluster(clusterIndex);
 		// Gets the FATEntry for the location of the next directory cluster
@@ -249,13 +248,11 @@ void Filesystem::findDirectoriesForCluster(int clusterIndex, int toDo)
 bool Filesystem::getDirectoryClusterNumber(string directory)
 {
 	string recordName;
-	bool foundRecord = false, readInProperDir = false;
-	int lastFoundDotDotIValue = 0;
+	bool foundRecord = false;
+	bool foundDot = false; // If found . then we know we can transition to .. soon
 	
 	for(unsigned int i = 0; i < files.size(); i++)
 		{
-			cout << "current cluster loc " << currentClusterLocation << endl;
-			
 			// If direcory
 			if((int)files[i].attr == 16 )
 			{
@@ -268,40 +265,34 @@ bool Filesystem::getDirectoryClusterNumber(string directory)
 					if(readInChar != ' ')
 						recordName.push_back(readInChar);
 				}	
-				recordName.erase(remove(recordName.begin(), recordName.end(), '\0'), recordName.end());
-				directory.erase(remove(directory.begin(), directory.end(), '\0'), directory.end());
-				
-				cout << "Record Name: " << recordName << "   " << "cluster number: " << files[i].fClusterLocation << " attribute " << (int)files[i].attr << endl;
 				
 				// Trims and converts to uppercase the record and directoryname
 				recordName = normalizeToUppercase(recordName, ' ');
 				/*if(recordName[0] == '.')
 					cout << "dot stuff" << endl;*/
 				directory = normalizeToUppercase(directory, ' ');
+				cout << "Directory read: " << recordName  << " file cluster loc: " <<  files[i].fClusterLocation << " current cluster loc: " <<  currentClusterLocation << endl;
 				
-				if(currentClusterLocation == files[i].fClusterLocation){
-					readInProperDir = true;
+				// For now we make any use of .. go to 2 (root cluster)
+				if(recordName == "." && files[i].fClusterLocation == currentClusterLocation){
+					foundDot = true;
 				}
-				
-				if(directory == ".." && !readInProperDir){
-					lastFoundDotDotIValue = i;
-				}
-				
-				// For now we make any use of .. 
-				// seems like each cluster number is unique so we can use that to know where to go
-				if(directory == ".." && recordName == directory && readInProperDir){
-					if(files[lastFoundDotDotIValue].fClusterLocation == 0)
-					cout << "ls .. is currently disabled to the root directory" << endl;
-					else
-					findDirectoriesForCluster(files[lastFoundDotDotIValue].fClusterLocation, 0);
-					
-					//cout << "Record Name: " << recordName << "   " << "cluster number: " << files[lastFoundDotDotIValue].fClusterLocation << endl;
+				else if(directory == ".." && foundDot){
+					findDirectoriesForCluster(2, 0);
 					foundRecord = true;
 					break;
 				}
-				else if(recordName == directory && directory != "..")
+				
+				if(directory == "." && recordName == directory && files[i].fClusterLocation == currentClusterLocation){
+					findDirectoriesForCluster(files[i].fClusterLocation, 0);
+					foundRecord = true;
+					break;
+				}else{
+					continue;
+				}
+				
+				if(recordName == directory)
 				{
-					cout << "hit 21" << endl;
 					findDirectoriesForCluster(files[i].fClusterLocation, 0);
 					foundRecord = true;
 					break;
@@ -386,9 +377,6 @@ void Filesystem::PrintCurrentDirectory(int directoryDataSector, bool store)
 	Checks if the directory exists in the current working directory
 */
 bool Filesystem::directoryExistsAndChangeTo(string directoryName){
-	bool readInProperDir = false;
-	int lastFoundDotDotIValue = 0;
-	
 	// Uppercase user input for comparison
 	transform(directoryName.begin(), directoryName.end(), directoryName.begin(),::toupper);
 	/*
@@ -410,7 +398,7 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 		// 	recordName.push_back(readInChar);
 		// }	
 		
-		//cout << "Record Name: " << recordName << "   " << "cluster number: " << files[i].fClusterLocation << endl;
+		cout << "Record Name: " << recordName << "   " << "cluster number: " << files[i].fClusterLocation << endl;
 		
 		// cout << "Record Name: " << recordName.length() << endl;
 		
@@ -420,26 +408,15 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 
 		// Trims and converts to uppercase the record and directoryname
 		recordName = normalizeToUppercase(recordName, ' ');
-		directoryName = normalizeToUppercase(directoryName,' ');
+		//directoryName = normalizeToUppercase(directoryName,' ');
 		//cant do this
 		//directoryName = normalizeToUppercase(directoryName, '.');
 		
 		// If directory and recordname = directorName
-		recordName.erase(remove(recordName.begin(), recordName.end(), '\0'), recordName.end());
-		directoryName.erase(remove(directoryName.begin(), directoryName.end(), '\0'), directoryName.end());
 		
-		cout << "recordName " << recordName << " directory Name " << directoryName << " entry type " << (int)files[i].attr << " x is " << x << " cluster loc " << files[i].fClusterLocation << endl; 
-		
-		if(currentClusterLocation == files[i].fClusterLocation){
-			readInProperDir = true;
-		}
-		if(directoryName == ".." && !readInProperDir){
-			lastFoundDotDotIValue = i;
-		}
-		
+		//cout << "recordName " << recordName << " directoryName " << directoryName << " entry type " << (int)files[i].attr << endl; 
 		while(recordName == directoryName && (int)files[i].attr == 16 && x!=0)
 		{
-			cout << "hey i should do something " << endl;
 			
 			//cout <<"currentClusterLocation" <<currentClusterLocation << endl;
 			if(directoryName == ".")
@@ -449,24 +426,22 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 			}
 			else if(directoryName == "..")
 			{
-				cout << "hey im here files i " << files[i].fClusterLocation << " current cluster " << currentClusterLocation << endl;
-				cout << "last dot is " << lastFoundDotDotIValue << endl;
-				// CHANGE i to lastFoundDotDotIValue to be back to where was earlier!
 				if(files[i].fClusterLocation == 0)
 					{
 						
-						currentClusterLocation = files[i].fClusterLocation;
+						currentClusterLocation = 2;
 						workingDirectory = "root";
 						return true;
 					}
 				if(files[i].fClusterLocation == currentClusterLocation)
 					{
+						
 						currentClusterLocation = files[i].fClusterLocation;
-						//findDirectoriesForCluster(files[i].fClusterLocation,2);
+						findDirectoriesForCluster(files[i].fClusterLocation,2);
 						return true;
 					}
 				
-			}
+				}
 			x--;
 			string filename = convertCharNameToString(x,11);
 			filename = normalizeToUppercase(filename, ' ');
@@ -476,15 +451,11 @@ bool Filesystem::directoryExistsAndChangeTo(string directoryName){
 			//First time this block of code runs, currentClusterLocaiton is the root cluster;
 			if(filename == "..")
 			{
-				cout << "hit1 " << endl;
 				if(files[x].fClusterLocation == currentClusterLocation || files[x].fClusterLocation == 0)
 				{
-					cout << "hit2 " << endl;
-					//currentClusterLocation = files[i].fClusterLocation;
-					fprintf(stderr,"%d\n",(int)files[i].fClusterLocation);
-					cout << "hit 3" << endl;
+					
+					currentClusterLocation = files[i].fClusterLocation;
 					findDirectoriesForCluster(files[i].fClusterLocation,2);
-					currentClusterLocation = files[i].fClusterLocation; // Updates cluster number for most cases
 					return true;
 				}
 			}
@@ -762,6 +733,7 @@ void Filesystem::removeFile(string file)
 		string hack = "#" + file;
 		
 		addFile(2050,hack,false);
+		cout << "File " << file << " removed" << endl;
 }
     // Otherwise we didnt find the directory
     else
@@ -902,8 +874,7 @@ void Filesystem::displayVectorContents()
 		{
 			cout << files[i].name[j];
 		}
-		cout << " " << files[i].fClusterLocation << endl;
-		
+		cout << endl;
 	}
 }
 
@@ -1101,7 +1072,7 @@ void Filesystem::addFile(int dataSector,string filename,bool dir)
   if(filename.size() != 11)
     filename.resize(11);
   uint8_t *bytes = new uint8_t[filename.size()];
-  bytes[filename.size()]=0;
+  //bytes[filename.size()]=0;
   memcpy(bytes,filename.c_str(),filename.size());
   
   record.currentFolder = workingDirectory;
@@ -1133,60 +1104,49 @@ void Filesystem::addFile(int dataSector,string filename,bool dir)
         {
           if( j == 11)
             {
-             uint8_t byte[] = {0x10};
-			if(!dir)
+             uint8_t byte[] = {0x00};
+				if(!dir)
               uint8_t byte[] = {0x20};
               else
               {
-				//cout <<"value " << byte << endl;
+              cout <<"value " << byte << endl;
               uint8_t byte[] = {0x10};	
               }
               
               offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
               fseek(imageFile,offset,SEEK_SET);
               fwrite(byte,sizeof(uint8_t),sizeof(byte),imageFile);
-          	}
-          	if(j == 20 && dir)
-          		{
-          			uint16_t lowbytes = (uint32_t)nextDirectorycluster & 0xFFFF;
-          			//uint16_t lowbytes[] = {(uint32_t)nextDirectorycluster & 0xFFFF};
-          			offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
-          			fseek(imageFile,offset,SEEK_SET);
-          			fwrite(&lowbytes,sizeof(uint16_t),sizeof(lowbytes),imageFile);
-          			fprintf(stdout, "%d", lowbytes);
+          }
+          if(j == 20 && dir)
+          {
+          	uint16_t lowbytes = (uint32_t)nextDirectorycluster & 0xFFFF;
+          	//uint16_t lowbytes[] = {(uint32_t)nextDirectorycluster & 0xFFFF};
+          	offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
+          	fseek(imageFile,offset,SEEK_SET);
+          	fwrite(&lowbytes,sizeof(uint16_t),sizeof(lowbytes),imageFile);
+          	fprintf(stdout, "%d", lowbytes);
           	
-				}
-        	if(j == 26 && dir)
-        		{
-        			uint16_t highbytes = (uint32_t)nextDirectorycluster >> 16;
-          			offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
-          			fseek(imageFile,offset,SEEK_SET);
-          			fwrite(&highbytes,sizeof(uint16_t),sizeof(&highbytes),imageFile);
-          			cout << "high word" << highbytes << endl;
-    		    }
+          }
+        if(j == 26 && dir)
+        {
+        	uint16_t highbytes = (uint32_t)nextDirectorycluster >> 16;
+          	offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
+          	fseek(imageFile,offset,SEEK_SET);
+          	fwrite(&highbytes,sizeof(uint16_t),sizeof(highbytes),imageFile);
+          	cout << "high word" << highbytes << endl;
+        }
         
-        	if(j == 28)
-    		 {
-        		 uint8_t bytes[] = {0x0,0x0,0x0,0x0};
-        		 offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
-        		 fseek(imageFile,offset,SEEK_SET);
-        		 fwrite(bytes,sizeof(uint8_t),sizeof(&bytes),imageFile);
+        if(j == 28)
+        {
+          uint8_t bytes[] = {0x0,0x0,0x0,0x0};
+          offset = (dataSector * BPB_BytsPerSec) + i * 32 + j;
+          fseek(imageFile,offset,SEEK_SET);
+          fwrite(bytes,sizeof(uint8_t),sizeof(bytes),imageFile);
         }
         record.fileSize = 0;
-       
-      	
+        if(!dir)record.attr = 32;
+      	if(dir)record.attr = 16;
         }
-       if(!dir)
-        {
-        
-        record.attr = 32;
-        }
-      	if(dir)
-      	{
-      	cout << "should be set" << endl;
-      	record.attr = 16;
-      	}
-      	record.fClusterLocation = nextDirectorycluster;
       for(iter = files.begin();iter!=files.end(); iter++)
       { 
         if((char)(*iter).name[0] =='.' && (char)(*iter).name[1] !='.' )
@@ -1196,7 +1156,6 @@ void Filesystem::addFile(int dataSector,string filename,bool dir)
           //cout << "current Cluster Location" << currentClusterLocation << endl;
           if((*iter).fClusterLocation == currentClusterLocation)
           {
-            cout << "pushed back " << endl;
             files.insert(iter+2,record);
             break;
           }
@@ -1231,7 +1190,7 @@ void Filesystem::createDirectory(string directoryName)
 {
 	 
 	nextDirectorycluster = findEmptyFAT();
-	findDirectoriesForCluster(currentClusterLocation,0);
+	findDirectoriesForCluster(currentClusterLocation,3);
  	addFile(dataSector,directoryName,true);
  	
  	//add . and .. entried in the cluster number of the new directory
@@ -1242,7 +1201,6 @@ void Filesystem::createDirectory(string directoryName)
 
 int Filesystem::findEmptyFAT()
 {
-	openImage();
 	cout << "test" << endl;
 	FatEntry entry;
 	int x = 2;
@@ -1253,15 +1211,8 @@ int Filesystem::findEmptyFAT()
 		nextCluster = parseInteger<uint32_t>(fdata + entry.FATOffset + entry.FATsecNum * BPB_BytsPerSec);
 		x++;
 	}
-	uint32_t bytes = 0x0FFFFFFF;
-	entry = findFatEntry(x-1);
-	long offset = (entry.FATOffset + entry.FATsecNum * BPB_BytsPerSec);
-	fseek(imageFile,offset,SEEK_SET);
-	fwrite(&bytes,sizeof(uint8_t),sizeof(&bytes),imageFile);
-	closeImage();
 	return x-1;
 }
-
 
 
 void Filesystem::makeDirectory(string directoryName){
